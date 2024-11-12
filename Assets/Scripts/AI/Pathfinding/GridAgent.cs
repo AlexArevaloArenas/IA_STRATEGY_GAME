@@ -64,6 +64,9 @@ public class Agent : MonoBehaviour
 
         float speedPercent = 1;
 
+        //Are we going down?
+        bool down = false;
+
         while (followingPath)
         {
             Vector2 pos2D = new Vector2(transform.position.x, transform.position.z);
@@ -80,21 +83,49 @@ public class Agent : MonoBehaviour
                 }
             }
 
+            
+
             if (followingPath)
             {
-
-                if (pathIndex >= path.slowDownIndex && stoppingDst > 0)
+                //Let's only go up if the next point is heigher
+                if (path.lookPoints[pathIndex].y == transform.position.y)
                 {
-                    speedPercent = Mathf.Clamp01(path.turnBoundaries[path.finishLineIndex].DistanceFromPoint(pos2D) / stoppingDst);
-                    if (speedPercent < 0.01f)
+                    if (pathIndex >= path.slowDownIndex && stoppingDst > 0)
                     {
-                        followingPath = false;
+                        speedPercent = Mathf.Clamp01(path.turnBoundaries[path.finishLineIndex].DistanceFromPoint(pos2D) / stoppingDst);
+                        if (speedPercent < 0.01f)
+                        {
+                            followingPath = false;
+                        }
                     }
+                    //Rotate Agent towards Look Points (Let's avoid changing x and z rotations)
+                    Quaternion targetRotation = Quaternion.LookRotation(path.lookPoints[pathIndex] - transform.position);
+
+                    targetRotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0); // Let's only modify the y rotation
+
+
+                    transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
+
+                    //Move Agent in the correct position
+                    transform.Translate(Vector3.forward * Time.deltaTime * speed * speedPercent, Space.Self);
+
+                    
+                }
+                else if(path.lookPoints[pathIndex].y > transform.position.y && !down) { //Basic movement up
+                    transform.Translate(Vector3.up * Time.deltaTime * speed * speedPercent, Space.Self);
+                }
+                else if (path.lookPoints[pathIndex].y < transform.position.y)
+                { //Basic movement down
+                    
+                    transform.Translate(Vector3.down * Time.deltaTime * speed * speedPercent, Space.Self);
+                    down = true;
+                }
+                else if (down && path.lookPoints[pathIndex].y > transform.position.y)
+                {
+                    transform.position = new Vector3(transform.position.x, path.lookPoints[pathIndex].y, transform.position.z);
+                    down = false;
                 }
 
-                Quaternion targetRotation = Quaternion.LookRotation(path.lookPoints[pathIndex] - transform.position);
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
-                transform.Translate(Vector3.forward * Time.deltaTime * speed * speedPercent, Space.Self);
             }
 
             yield return null;
