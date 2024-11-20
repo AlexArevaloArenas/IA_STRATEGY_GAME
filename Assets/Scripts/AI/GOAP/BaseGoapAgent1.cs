@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+/*using System.Collections.Generic;
 using System.Linq;
 using DependencyInjection; // https://github.com/adammyhre/Unity-Dependency-Injection-Lite
 using UnityEngine;
@@ -23,17 +23,9 @@ public class GoapAgent : MonoBehaviour
     AnimationController animations;
     Rigidbody rb;
 
-    [Header("Unit Data")]
+    [Header("Stats")]
     public float health = 100;
     public float stamina = 100;
-
-    public enum Class {
-        Mage,
-        Warrior,
-        Ranger
-    };
-
-    public Class classType;
 
     CountdownTimer statsTimer;
 
@@ -296,4 +288,4 @@ public class GoapAgent : MonoBehaviour
             actionPlan = potentialPlan;
         }
     }
-}
+}*/
