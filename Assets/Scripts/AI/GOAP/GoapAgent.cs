@@ -27,14 +27,6 @@ public class GoapAgent : MonoBehaviour
     public float health = 100;
     public float stamina = 100;
 
-    public enum Class {
-        Mage,
-        Warrior,
-        Ranger
-    };
-
-    public Class classType;
-
     CountdownTimer statsTimer;
 
     GameObject target;
