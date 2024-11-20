@@ -23,10 +23,30 @@ public class BeliefFactory
 
     public void AddSensorBelief(string key, Sensor sensor)
     {
-        beliefs.Add(key, new AgentBelief.Builder(key)
-            .WithCondition(() => sensor.IsTargetInRange)
-            .WithLocation(() => sensor.TargetPosition)
-            .Build());
+        foreach (var mage in sensor.targetMagePositions) {
+            beliefs.Add(key, new AgentBelief.Builder(key)
+                /*.WithCondition(() => sensor.IsTargetInRange)*/
+                .WithLocation(() => mage)
+                .Build());
+        }
+        foreach (var knight in sensor.targetKnightPositions) {
+            beliefs.Add(key, new AgentBelief.Builder(key)
+                /*.WithCondition(() => sensor.IsTargetInRange)*/
+                .WithLocation(() => knight)
+                .Build());
+        }
+        foreach (var archer in sensor.targetArcherPositions) {
+            beliefs.Add(key, new AgentBelief.Builder(key)
+                /*.WithCondition(() => sensor.IsTargetInRange)*/
+                .WithLocation(() => archer)
+                .Build());
+        }
+        foreach (var pawn in sensor.targetPawnPositions) {
+            beliefs.Add(key, new AgentBelief.Builder(key)
+                /*.WithCondition(() => sensor.IsTargetInRange)*/
+                .WithLocation(() => pawn)
+                .Build());
+        }
     }
 
     public void AddLocationBelief(string key, float distance, Transform locationCondition)

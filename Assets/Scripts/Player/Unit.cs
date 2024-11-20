@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Unit : MonoBehaviour
 {
     public bool visible;
-    public Type type;
+    public UnitType type;
     private Agent pathfindingAgent;
 
     private void Start()
@@ -29,7 +29,7 @@ public class Unit : MonoBehaviour
 
 }
 
-public enum Type
+public enum UnitType
 {
     Knight,
     Mage,

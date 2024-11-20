@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 //using Malevolent;
 using UnityEngine;
 
@@ -6,18 +7,17 @@ using UnityEngine;
 public class Sensor : MonoBehaviour
 {
     [SerializeField] float detectionRadius = 5f;
-    [SerializeField] float timerInterval = 1f;
+    //[SerializeField] float timerInterval = 1f;
 
     SphereCollider detectionRange;
 
     public event Action OnTargetChanged = delegate { };
 
-    public Vector3 TargetPosition => target ? target.transform.position : Vector3.zero;
-    public bool IsTargetInRange => TargetPosition != Vector3.zero;
-
-    GameObject target;
-    Vector3 lastKnownPosition;
-    CountdownTimer timer;
+    private List<GameObject> targets = new List<GameObject>();
+    public List<Vector3> targetMagePositions = new List<Vector3>();
+    public List<Vector3> targetKnightPositions = new List<Vector3>();
+    public List<Vector3> targetArcherPositions = new List<Vector3>();
+    public List<Vector3> targetPawnPositions = new List<Vector3>();
 
     void Awake()
     {
@@ -26,7 +26,7 @@ public class Sensor : MonoBehaviour
         detectionRange.radius = detectionRadius;
     }
 
-    void Start()
+    /*void Start()
     {
         timer = new CountdownTimer(timerInterval);
         timer.OnTimerStop += () => {
@@ -34,38 +34,58 @@ public class Sensor : MonoBehaviour
             timer.Start();
         };
         timer.Start();
-    }
+    }*/
 
-    void Update()
+    /*void Update()
     {
         timer.Tick(Time.deltaTime);
-    }
+    }*/
 
-    void UpdateTargetPosition(GameObject target = null)
+    void UpdateTargetPositions()
     {
-        this.target = target;
-        if (IsTargetInRange && (lastKnownPosition != TargetPosition || lastKnownPosition != Vector3.zero))
+        targetMagePositions.Clear();
+        targetKnightPositions.Clear();
+        targetArcherPositions.Clear();
+        targetPawnPositions.Clear();
+
+        foreach (var target in targets)
         {
-            lastKnownPosition = TargetPosition;
-            OnTargetChanged.Invoke();
+            Unit unit = target.GetComponent<Unit>();
+            if (unit != null && unit.visible){
+                switch (unit.type)
+                {
+                    case UnitType.Mage:
+                        targetMagePositions.Add(target.transform.position);
+                        break;
+                    case UnitType.Knight:
+                        targetKnightPositions.Add(target.transform.position);
+                        break;
+                    case UnitType.Archer:
+                        targetArcherPositions.Add(target.transform.position);
+                        break;
+                    case UnitType.Pawn:
+                        targetPawnPositions.Add(target.transform.position);
+                        break;
+                }
+            }
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        UpdateTargetPosition(other.gameObject);
+        targets.Add(other.gameObject);
     }
 
     void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        UpdateTargetPosition();
+        targets.Remove(other.gameObject);
     }
 
     void OnDrawGizmos()
     {
-        Gizmos.color = IsTargetInRange ? Color.red : Color.green;
+        //Gizmos.color = IsTargetInRange ? Color.red : Color.green;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 }
