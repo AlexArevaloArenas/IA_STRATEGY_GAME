@@ -7,6 +7,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Agent))]
 public class Unit : MonoBehaviour
 {
+    public bool visible;
+
     private Agent pathfindingAgent;
 
     private void Start()
