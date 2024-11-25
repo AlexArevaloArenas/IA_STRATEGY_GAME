@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-/*
+
     public static GameManager Instance { get; private set; }
     int state = -1;
-    public int liveChickens = 0;
-    public bool caught = false;
+    GameObject[] playerTeam;
+    GameObject[] enemyTeam;
+    public bool acabado = false;
     bool victory = false;
+    int teamSize;
 
     public GameObject canvasPrefab;
 
@@ -41,16 +43,13 @@ public class GameManager : MonoBehaviour {
 
     public void statCheck() {
 
-        if (caught) {
-            state = 2;
-        }
-        else if (liveChickens == 0) {
-            victory = true;
-            state = 2;
-        }
+        
+        
     }
 
     void startGame() {
+        GeneraEquipos();
+        //if (creación de personajes completa) state = 1;
     }
 
     void runGame() {
@@ -60,12 +59,60 @@ public class GameManager : MonoBehaviour {
     void endGame() {
         
         if (victory) {
-            canvasPrefab.GetComponent<Menu>().YouWin();
+            //canvasPrefab.GetComponent<Menu>().YouWin();
         }
         else {
-            canvasPrefab.GetComponent<Menu>().YouDied();
+            //canvasPrefab.GetComponent<Menu>().YouDied();
         }
         Time.timeScale = 0;
     }
-    */
+
+    void GeneraEquipos()
+    {
+        int r = -1;
+        for (int i = 0; i<teamSize;i++){
+            if (i >teamSize/2 && teamSize > 3){
+                //playerTeam[i] = infanteria
+                //enemyTeam[i] = infanteria
+            }
+            else{
+                r = Random.Range(0,2);
+                switch (r) {
+                    case 0: {
+                        //playerTeam[i] = mago
+
+                        break;
+                    } 
+                    case 1: {
+                        //playerTeam[i] = caballero
+                        break;
+                    } 
+                    case 2: {
+                        //playerTeam[i] = arquero
+                        break;
+                    } 
+                }
+                r = Random.Range(0,2);
+                switch (r) {
+                    case 0: {
+                        //enemyTeam[i] = mago
+
+                        break;
+                    } 
+                    case 1: {
+                        //enemyTeam[i] = caballero
+                        break;
+                    } 
+                    case 2: {
+                        //enemyTeam[i] = arquero
+                        break;
+                    } 
+                }
+            }
+            //playerTeam[i].position = ;
+            //enemyTeam[i].position = ;
+        }
+
+
+    }    
 }
