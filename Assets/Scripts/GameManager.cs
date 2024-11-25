@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour {
     GameObject[] enemyTeam;
     public bool acabado = false;
     bool victory = false;
+    public bool isPlayerTurn;
+    [SerializeField] private int unitsPerTurn;
+    public int unitsUsed;
     int teamSize;
 
     public GameObject canvasPrefab;
@@ -38,22 +41,47 @@ public class GameManager : MonoBehaviour {
             case 1: runGame(); break;
             case 2: endGame(); break;
         }
-        statCheck();
     }
 
-    public void statCheck() {
-
-        
-        
-    }
 
     void startGame() {
         GeneraEquipos();
-        //if (creación de personajes completa) state = 1;
+        /*
+        if (creación de personajes completa){ 
+        if (Random.Range(0,1) == 0) isPlayerTurn = true;
+        else isPlayerTurn = false;
+        unitUsed = 0;
+        state = 1;
+        }
+        */
     }
 
     void runGame() {
+        if (playerTeam.Length == 0){
+            //Jugador Pierde
+            Time.timeScale = 0;
+            //Mostrar cosas del canvas
+        }
+        
+        else if (enemyTeam.Length == 0){
+            //Jugador Gana
+            Time.timeScale = 0;
+            //Mostrar cosas del canvas
+        }
 
+        if (unitsUsed>= unitsPerTurn){
+            isPlayerTurn = !isPlayerTurn;
+            unitsUsed = 0;
+        }
+
+        if (isPlayerTurn){
+            //el jugador puede seleccionar lo que quiera, hay que incluir que al seleccionar el ataque de una unidad no se pueda seleccionar ya, y se haga un unitsUsed++
+        } 
+        else {
+            //que la Ia haga sus cosas de GOAP e historias, cuando haga el ataque con una unidad, hay que hacer que no pueda hacer nada con esa en este turno, y que se haga un unitsUsed++
+        }
+            
+        statCheck();
     }
 
     void endGame() {
@@ -115,4 +143,11 @@ public class GameManager : MonoBehaviour {
 
 
     }    
+    
+    void statCheck() {
+
+        
+        
+    }
+
 }

@@ -625,6 +625,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acabado: 0
+  isPlayerTurn: 0
+  unitsPerTurn: 3
+  unitsUsed: 0
   canvasPrefab: {fileID: 623490946}
 --- !u!4 &1835877092
 Transform:
