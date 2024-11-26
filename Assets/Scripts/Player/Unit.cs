@@ -11,6 +11,12 @@ public class Unit : MonoBehaviour
     public UnitType type;
     private Agent pathfindingAgent;
 
+    public float MaxHealth;
+    private float currentHealth;
+    public float AttackDamage;
+    public float AttackRange;
+    public float MoveRange;
+
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
@@ -25,6 +31,16 @@ public class Unit : MonoBehaviour
     public void Move(Vector3 punto)
     {
         pathfindingAgent.GoTo(punto);
+    }
+
+    public void Attack(GameObject enemy)
+    {
+        return;
+    }
+
+    public void GetDamage()
+    {
+
     }
 
 }
