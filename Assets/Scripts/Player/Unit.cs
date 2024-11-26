@@ -35,14 +35,38 @@ public class Unit : MonoBehaviour
 
     public void Attack(GameObject enemy)
     {
-        return;
+        Vector3 direction = (transform.position - enemy.transform.position).normalized;
+        if (Physics.Raycast(transform.position, direction, AttackRange))
+        {
+            UnitType type = enemy.GetComponent<Unit>().type;
+            switch (type) {
+                case UnitType.Mage:
+                    break;
+                case UnitType.Knight:
+                    break;
+                case UnitType.Archer:
+                    break;
+                case UnitType.Pawn:
+                    break;
+                default:
+                    break;
+
+            }
+        }
     }
 
-    public void GetDamage()
+    public void GetDamage(float damage)
     {
-
+        currentHealth -= damage;
+        if (currentHealth < 0) {
+            Destroy(this);
+        }
     }
 
+    public void OnDestroy()
+    {
+        //Dead Animation and Particles
+    }
 }
 
 public enum UnitType
