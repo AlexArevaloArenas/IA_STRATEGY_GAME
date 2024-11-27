@@ -156,4 +156,22 @@ public class Agent : MonoBehaviour
     }
 
 }
+    /*GameObject[] GetEnemiesInRange( Unit UnidadSeleccionada, GameObject[] listaUnidadesJugador) {
+		
+        //nodoUnidadSeleccionada: Unidad controlada por la ia de la que quieres comprobar a quién puede atacar
+        //listaUnidadesJugador: lista con todas las unidades VISIBLES* del jugador  *(si al final pasamos de la niebla de guerra, ignorar lo de visibles)
+        
+
+	 	//para cada iteración, crea un clon, le hace moverse la distancia máxima haca el enemigo, y entonces hace un raycast para ver si hay un obstáculo 
+        //entre medias, si da, entonces se añade ese enemigo al array de enemigosAtacables, y si no, pues nada 
+        
+        float attackRange = UnidadSeleccionada.AttackRange;
+        float attackDamage = UnidadSeleccionada.AttackDamage;
+
+		foreach (Unit in UnidadSeleccionada)
+		{
+			
+		}
+	}*/
+
 }
