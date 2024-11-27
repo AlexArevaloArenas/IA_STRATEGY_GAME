@@ -107,6 +107,8 @@ public class Pathfinding : MonoBehaviour {
 		return 14*dstX + 10 * (dstY-dstX);
 	}
 	
+	
+
 	//EXTRAS: find safest nodes
 	public GridNode[] SafestNodesAvailable(GameObject unit,GameObject enemies, int nodeQuantity, int distance)
 	{
