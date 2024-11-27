@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
 
 public class Agent : MonoBehaviour
 {
@@ -148,4 +149,11 @@ public class Agent : MonoBehaviour
         StartCoroutine(UpdatePath());
     }
 
+
+    public Unit[] EnemiesAvailable()
+    {
+        return PathRequestManager.FindEnemiesAvailable(transform.position, GetComponent<Unit>().MoveRange, GetComponent<Unit>().AttackRange);
+    }
+
+}
 }

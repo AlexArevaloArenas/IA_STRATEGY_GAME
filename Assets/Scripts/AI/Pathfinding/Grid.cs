@@ -18,14 +18,22 @@ public class Grid : MonoBehaviour {
     GridNode[,] grid;
 
 	float nodeDiameter;
-	int gridSizeX, gridSizeY;
+	float diagonalDistance;
+	float horizontalDitance;
+
+
+
+    public int gridSizeX, gridSizeY;
 
 	int penaltyMin = int.MaxValue;
 	int penaltyMax = int.MinValue;
 
 	void Awake() {
 		nodeDiameter = nodeRadius*2;
-		gridSizeX = Mathf.RoundToInt(gridWorldSize.x/nodeDiameter);
+        horizontalDitance = nodeDiameter;
+        diagonalDistance = Mathf.Sqrt(Mathf.Pow(nodeDiameter,2)+ Mathf.Pow(nodeDiameter, 2));
+
+        gridSizeX = Mathf.RoundToInt(gridWorldSize.x/nodeDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y/nodeDiameter);
 
 		foreach (TerrainType region in walkableRegions) {
@@ -227,5 +235,41 @@ public class Grid : MonoBehaviour {
 		public int terrainPenalty;
 	}
 
+	/*
+	public float NodeDistance(GridNode node1, GridNode node2)
+	{
+        bool[,] revisedNodes = new bool[gridSizeX, gridSizeY];
+        for (int i = 0; i < gridSizeX; i++)
+        {
+            for (int j = 0; j < gridSizeY; j++)
+            {
+                revisedNodes[i, j] = false;
+            }
+        }
+        return 
+	}
 
+    public float DistanceNodeSearch(GridNode node, GridNode targetNode, float distance, bool[,] revisedNodeMatrix)
+    {
+		if ()
+		{
+
+		}
+
+        if (!revisedNodeMatrix[node.gridX, node.gridY] && range < 0)
+        {
+            revisedNodeMatrix[node.gridX, node.gridY] = true;
+
+            // Exploramos los vecinos del nodo actual
+            foreach (GridNode nn in GetNeighbours(node))
+            {
+                // Realizamos búsqueda recursiva con una profundidad reducida
+                float plusDistance = Vector3.Distance(nn.worldPosition, node.worldPosition);
+                DistanceNodeSearch(nn, distance+plusDistance, revisedNodeMatrix);
+            }
+
+        }
+
+    }
+	*/
 }

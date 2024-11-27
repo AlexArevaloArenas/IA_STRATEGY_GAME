@@ -3,10 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
+using UnityEngine.Rendering.VirtualTexturing;
+using UnityEditor.Experimental.GraphView;
+using static UnityEditor.PlayerSettings;
 
 public class Pathfinding : MonoBehaviour {
 
-	Grid grid;
+	public Grid grid;
+	public LayerMask enemyUnits;
+	public LayerMask playerUnits;
+
 	
 	void Awake() {
 		grid = GetComponent<Grid>();
@@ -119,5 +125,46 @@ public class Pathfinding : MonoBehaviour {
 
 		return safestNodes;
     }
+
+	public void FindAvailableEnemies(GridNode node,float moveRange, float attackRange, ref List<Unit> attackableEnemies, bool[,] revisedNodeMatrix, Unit[] enemies)
+    {
+
+        if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
+        {
+            revisedNodeMatrix[node.gridX, node.gridY] = true;
+
+			foreach (Unit u in enemies) {
+
+				if (Physics.Raycast(node.worldPosition, node.worldPosition - u.transform.position, attackRange, enemyUnits))
+				{
+                    if (!attackableEnemies.Contains(u))
+                    {
+                        attackableEnemies.Add(u);
+                    }
+                }
+            }
+
+            // Exploramos los vecinos del nodo actual
+			foreach (GridNode nn in grid.GetNeighbours(node))
+            {
+				// Realizamos búsqueda recursiva con una profundidad reducida
+				float distance = Vector3.Distance(nn.worldPosition,node.worldPosition);
+                FindAvailableEnemies(nn, moveRange, attackRange- distance, ref attackableEnemies, revisedNodeMatrix, enemies);
+            }
+
+        }
+
+    }
+
+	public void FindSafePlaces(GridNode node, float range, List<Unit> enemies, bool[,] revisedNodeMatrix)
+	{
+
+	}
+
+    public void FindBestAttackPlace(GridNode node, float range, List<Unit> enemies, bool[,] revisedNodeMatrix)
+    {
+
+    }
+
 
 }

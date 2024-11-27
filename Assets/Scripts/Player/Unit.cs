@@ -38,8 +38,8 @@ public class Unit : MonoBehaviour
         Vector3 direction = (transform.position - enemy.transform.position).normalized;
         if (Physics.Raycast(transform.position, direction, AttackRange))
         {
-            UnitType type = enemy.GetComponent<Unit>().type;
-            switch (type) {
+            UnitType enemytype = enemy.GetComponent<Unit>().type;
+            switch (enemytype) {
                 case UnitType.Mage:
                     break;
                 case UnitType.Knight:

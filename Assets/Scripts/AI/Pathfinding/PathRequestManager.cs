@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Threading;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.SocialPlatforms;
+using Unity.VisualScripting;
 
 public class PathRequestManager : MonoBehaviour {
 
@@ -38,11 +41,26 @@ public class PathRequestManager : MonoBehaviour {
 	public void FinishedProcessingPath(PathResult result) {
 		lock (results) {
 			results.Enqueue (result);
-		}
-	}
+        }
+    }
+    public static Unit[] FindEnemiesAvailable(Vector3 pos, float moveRange, float attackRange)
+    {
+		List<Unit> attacktableEnemies = new List<Unit>();
+		Unit[] enemies = new Unit[1];
 
+        bool[,] revisedNodes = new bool[instance.pathfinding.grid.gridSizeX, instance.pathfinding.grid.gridSizeY];
+        for (int i = 0; i < instance.pathfinding.grid.gridSizeX; i++)
+        {
+            for (int j = 0; j < instance.pathfinding.grid.gridSizeY; j++)
+            {
+                revisedNodes[i, j] = false;
+            }
+        }
 
-
+        instance.pathfinding.FindAvailableEnemies(instance.pathfinding.grid.NodeFromWorldPoint(pos), moveRange, attackRange, ref attacktableEnemies, revisedNodes, enemies);
+		
+		return attacktableEnemies.ToArray();
+    }
 }
 
 public struct PathResult {
