@@ -13,11 +13,23 @@ public class Sensor : MonoBehaviour
 
     public event Action OnTargetChanged = delegate { };
 
-    private List<GameObject> targets = new List<GameObject>();
-    public List<Vector3> targetMagePositions = new List<Vector3>();
-    public List<Vector3> targetKnightPositions = new List<Vector3>();
-    public List<Vector3> targetArcherPositions = new List<Vector3>();
-    public List<Vector3> targetPawnPositions = new List<Vector3>();
+    public struct unitData {
+        public string id;
+        public Vector3 position;
+        public UnitType type;
+        public float maxHealth;
+        public float currentHealth;
+        public unitData(string id, Vector3 position, UnitType type, (float, float) health) {
+            this.id = id;
+            this.position = position;
+            this.type = type;
+            this.currentHealth = health.Item1;
+            this.maxHealth = health.Item2;
+        }
+    };
+
+    private List<GameObject> foundTargets = new List<GameObject>();
+    public List<unitData> seenTargets = new List<unitData>();
 
     void Awake()
     {
@@ -43,30 +55,16 @@ public class Sensor : MonoBehaviour
 
     void UpdateTargetPositions()
     {
-        targetMagePositions.Clear();
-        targetKnightPositions.Clear();
-        targetArcherPositions.Clear();
-        targetPawnPositions.Clear();
+        seenTargets.Clear();
 
-        foreach (var target in targets)
+        foreach (var target in foundTargets)
         {
             Unit unit = target.GetComponent<Unit>();
             if (unit != null && unit.visible){
-                switch (unit.type)
-                {
-                    case UnitType.Mage:
-                        targetMagePositions.Add(target.transform.position);
-                        break;
-                    case UnitType.Knight:
-                        targetKnightPositions.Add(target.transform.position);
-                        break;
-                    case UnitType.Archer:
-                        targetArcherPositions.Add(target.transform.position);
-                        break;
-                    case UnitType.Pawn:
-                        targetPawnPositions.Add(target.transform.position);
-                        break;
-                }
+                seenTargets.Add(new unitData( target.GetInstanceID().ToString(),
+                                                target.transform.position,
+                                                unit.type,
+                                                (unit.GetHealth(), unit.MaxHealth)));
             }
         }
     }
@@ -74,13 +72,13 @@ public class Sensor : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        targets.Add(other.gameObject);
+        foundTargets.Add(other.gameObject);
     }
 
     void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        targets.Remove(other.gameObject);
+        foundTargets.Remove(other.gameObject);
     }
 
     void OnDrawGizmos()

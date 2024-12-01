@@ -23,29 +23,18 @@ public class BeliefFactory
 
     public void AddSensorBelief(string key, Sensor sensor)
     {
-        foreach (var mage in sensor.targetMagePositions) {
-            beliefs.Add(key, new AgentBelief.Builder(key)
-                /*.WithCondition(() => sensor.IsTargetInRange)*/
-                .WithLocation(() => mage)
-                .Build());
-        }
-        foreach (var knight in sensor.targetKnightPositions) {
-            beliefs.Add(key, new AgentBelief.Builder(key)
-                /*.WithCondition(() => sensor.IsTargetInRange)*/
-                .WithLocation(() => knight)
-                .Build());
-        }
-        foreach (var archer in sensor.targetArcherPositions) {
-            beliefs.Add(key, new AgentBelief.Builder(key)
-                /*.WithCondition(() => sensor.IsTargetInRange)*/
-                .WithLocation(() => archer)
-                .Build());
-        }
-        foreach (var pawn in sensor.targetPawnPositions) {
-            beliefs.Add(key, new AgentBelief.Builder(key)
-                /*.WithCondition(() => sensor.IsTargetInRange)*/
-                .WithLocation(() => pawn)
-                .Build());
+        foreach (Sensor.unitData target in sensor.seenTargets)
+        {
+            bool found = false;
+            /*foreach (var belief in beliefs)
+            {
+                if (belief.TryGetValue().unitDataPack.id == target.id)
+                {
+                    found = true;
+                    belief.unitDataPack = target;
+                }
+            }*/
+            if (!found) AddUnitBelief(key + target.id, target);
         }
     }
 
@@ -59,6 +48,13 @@ public class BeliefFactory
         beliefs.Add(key, new AgentBelief.Builder(key)
             .WithCondition(() => InRangeOf(locationCondition, distance))
             .WithLocation(() => locationCondition)
+            .Build());
+    }
+
+    public void AddUnitBelief(string key, Sensor.unitData unitData) {
+        beliefs.Add(key, new AgentBelief.Builder(key)
+            .WithUnit(unitData)
+            .WithLocation(() => unitData.position)
             .Build());
     }
 
@@ -81,6 +77,8 @@ public class AgentBelief
 
     public bool Evaluate() => condition();
 
+    public Sensor.unitData unitDataPack;
+
     public class Builder
     {
         readonly AgentBelief belief;
@@ -99,6 +97,12 @@ public class AgentBelief
         public Builder WithLocation(Func<Vector3> observedLocation)
         {
             belief.observedLocation = observedLocation;
+            return this;
+        }
+
+        public Builder WithUnit(Sensor.unitData uD)
+        {
+            belief.unitDataPack = uD;
             return this;
         }
 

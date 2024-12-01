@@ -63,6 +63,11 @@ public class Unit : MonoBehaviour
         }
     }
 
+    public float GetHealth()
+    {
+        return currentHealth;
+    }
+
     public void OnDestroy()
     {
         //Dead Animation and Particles
