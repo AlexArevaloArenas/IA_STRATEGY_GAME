@@ -61,6 +61,49 @@ public class PathRequestManager : MonoBehaviour {
 		
 		return attacktableEnemies.ToArray();
     }
+
+	public static GridNode[] FindBestAttackPlaces(Vector3 pos, float moveRange, Unit targetUnit, List<Unit> enemies, UnitType unitType)
+    {
+        bool[,] revisedNodes = new bool[instance.pathfinding.grid.gridSizeX, instance.pathfinding.grid.gridSizeY];
+        for (int i = 0; i < instance.pathfinding.grid.gridSizeX; i++)
+        {
+            for (int j = 0; j < instance.pathfinding.grid.gridSizeY; j++)
+            {
+                revisedNodes[i, j] = false;
+            }
+        }
+
+        return instance.pathfinding.GetBestAttackPlaces(
+            instance.pathfinding.grid.NodeFromWorldPoint(pos),
+            moveRange,
+            targetUnit,
+            enemies,
+            revisedNodes,
+            unitType
+        );
+    }
+
+    public static GridNode[] FindSafePlaces(Vector3 pos, float moveRange, List<Unit> enemies)
+    {
+        bool[,] revisedNodes = new bool[instance.pathfinding.grid.gridSizeX, instance.pathfinding.grid.gridSizeY];
+        for (int i = 0; i < instance.pathfinding.grid.gridSizeX; i++)
+        {
+            for (int j = 0; j < instance.pathfinding.grid.gridSizeY; j++)
+            {
+                revisedNodes[i, j] = false;
+            }
+        }
+
+        return instance.pathfinding.GetSafePlaces(
+            instance.pathfinding.grid.NodeFromWorldPoint(pos),
+            moveRange,
+            enemies,
+            revisedNodes
+        );
+    }
+
+
+
 }
 
 public struct PathResult {

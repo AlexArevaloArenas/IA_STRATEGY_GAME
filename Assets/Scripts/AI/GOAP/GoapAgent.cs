@@ -29,6 +29,9 @@ public class GoapAgent : MonoBehaviour
 
     CountdownTimer statsTimer;
 
+    Unit currentUnit;
+    Unit enemyUnit;
+
     GameObject target;
     Vector3 destination;
 
@@ -95,89 +98,29 @@ public class GoapAgent : MonoBehaviour
             .AddEffect(beliefs["Nothing"])
             .Build());
 
-        actions.Add(new AgentAction.Builder("Wander Around")
-            .WithStrategy(new WanderStrategy(navMeshAgent, 10))
-            .AddEffect(beliefs["AgentMoving"])
-            .Build());
+            /*
 
-        actions.Add(new AgentAction.Builder("MoveToEatingPosition")
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => foodShack.position))
-            .AddEffect(beliefs["AgentAtFoodShack"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("Eat")
-            .WithStrategy(new IdleStrategy(5))  // Later replace with a Command
-            .AddPrecondition(beliefs["AgentAtFoodShack"])
-            .AddEffect(beliefs["AgentIsHealthy"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("MoveToDoorOne")
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => doorOnePosition.position))
-            .AddEffect(beliefs["AgentAtDoorOne"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("MoveToDoorTwo")
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => doorTwoPosition.position))
-            .AddEffect(beliefs["AgentAtDoorTwo"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("MoveFromDoorOneToRestArea")
-            .WithCost(2)
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => restingPosition.position))
-            .AddPrecondition(beliefs["AgentAtDoorOne"])
-            .AddEffect(beliefs["AgentAtRestingPosition"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("MoveFromDoorTwoRestArea")
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => restingPosition.position))
-            .AddPrecondition(beliefs["AgentAtDoorTwo"])
-            .AddEffect(beliefs["AgentAtRestingPosition"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("Rest")
-            .WithStrategy(new IdleStrategy(5))
-            .AddPrecondition(beliefs["AgentAtRestingPosition"])
-            .AddEffect(beliefs["AgentIsRested"])
-            .Build());
-
-        actions.Add(new AgentAction.Builder("ChasePlayer")
-            .WithStrategy(new MoveStrategy(navMeshAgent, () => beliefs["PlayerInChaseRange"].Location))
+        actions.Add(new AgentAction.Builder("MoveToAttackPosition")
+            .WithStrategy(new MoveToAttackPositionStrategy(currentUnit, enemyUnit))
             .AddPrecondition(beliefs["PlayerInChaseRange"])
             .AddEffect(beliefs["PlayerInAttackRange"])
             .Build());
 
         actions.Add(new AgentAction.Builder("AttackPlayer")
-            .WithStrategy(new AttackStrategy(animations))
+            .WithStrategy(new AttackStrategy(currentUnit))
             .AddPrecondition(beliefs["PlayerInAttackRange"])
             .AddEffect(beliefs["AttackingPlayer"])
             .Build());
+            */
+
+        
     }
 
     void SetupGoals()
     {
         goals = new HashSet<AgentGoal>();
 
-        goals.Add(new AgentGoal.Builder("Chill Out")
-            .WithPriority(1)
-            .WithDesiredEffect(beliefs["Nothing"])
-            .Build());
-
-        goals.Add(new AgentGoal.Builder("Wander")
-            .WithPriority(1)
-            .WithDesiredEffect(beliefs["AgentMoving"])
-            .Build());
-
-        goals.Add(new AgentGoal.Builder("KeepHealthUp")
-            .WithPriority(2)
-            .WithDesiredEffect(beliefs["AgentIsHealthy"])
-            .Build());
-
-        goals.Add(new AgentGoal.Builder("KeepStaminaUp")
-            .WithPriority(2)
-            .WithDesiredEffect(beliefs["AgentIsRested"])
-            .Build());
-
-        goals.Add(new AgentGoal.Builder("SeekAndDestroy")
+        goals.Add(new AgentGoal.Builder("AttackEnemyTarget")
             .WithPriority(3)
             .WithDesiredEffect(beliefs["AttackingPlayer"])
             .Build());
@@ -218,7 +161,7 @@ public class GoapAgent : MonoBehaviour
     void Update()
     {
         statsTimer.Tick(Time.deltaTime);
-        animations.SetSpeed(navMeshAgent.velocity.magnitude);
+        //animations.SetSpeed(navMeshAgent.velocity.magnitude);
 
         // Update the plan and current action if there is one
         if (currentAction == null)
