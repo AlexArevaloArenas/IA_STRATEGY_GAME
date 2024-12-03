@@ -26,14 +26,15 @@ public class BeliefFactory
         foreach (Sensor.unitData target in sensor.seenTargets)
         {
             bool found = false;
-            /*foreach (var belief in beliefs)
+            foreach (var belief in beliefs.Values)
             {
-                if (belief.TryGetValue().unitDataPack.id == target.id)
+                if (belief.unitDataPack.id == target.id)
                 {
                     found = true;
                     belief.unitDataPack = target;
+                    break;
                 }
-            }*/
+            }
             if (!found) AddUnitBelief(key + target.id, target);
         }
     }
