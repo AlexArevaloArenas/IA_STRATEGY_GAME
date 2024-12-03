@@ -10,6 +10,7 @@ public class Agent : MonoBehaviour
     const float pathUpdateMoveThreshold = .5f;
 
     public GameObject target;
+    public GameObject sprite;
     public float speed = 20;
     public float turnSpeed = 3;
     public float turnDst = 5;
@@ -111,7 +112,23 @@ public class Agent : MonoBehaviour
                     //Move Agent in the correct position
                     transform.Translate(Vector3.forward * Time.deltaTime * speed * speedPercent, Space.Self);
 
-                    
+                     //Esto es para que se flipee el sprite cuando toca
+                    if (sprite != null){
+
+                        SpriteRenderer spriteRenderer = sprite.GetComponent<SpriteRenderer>();
+
+
+                        if (DoesVectorPointToTheRight(transform.forward) == true) {
+                            //sprite.transform.rotation = Quaternion.Euler(new Vector3(60, 0, 0));
+                            spriteRenderer.flipX = false;
+                        }
+
+                        else{
+                            //sprite.transform.rotation = Quaternion.Euler(new Vector3(-60, 180, 0));
+                            spriteRenderer.flipX = true;
+                        }
+                    }
+
                 }
                 else if(path.lookPoints[pathIndex].y > transform.position.y && !down) { //Basic movement up
                     transform.Translate(Vector3.up * Time.deltaTime * speed * speedPercent, Space.Self);
@@ -178,6 +195,24 @@ public class Agent : MonoBehaviour
     public GridNode[] FindSafePlaces(List<Unit> enemies)
     {
         return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies);
+    }
+
+    private bool DoesVectorPointToTheRight(Vector3 vector)
+    {
+        // Obtén el vector forward del objeto
+        Vector3 forward = vector;
+
+        // Proyección del vector forward sobre el eje X
+        float forwardX = Vector3.Dot(forward, Vector3.right);
+
+        if (forwardX >= 0)
+        {
+            return true;
+        }
+        else
+        {
+           return false;
+        }
     }
 
 }
