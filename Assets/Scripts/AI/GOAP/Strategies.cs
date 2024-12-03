@@ -44,9 +44,15 @@ public class MoveToAttackPositionStrategy : IActionStrategy
 
     public void Start()
     {
+        // First step: Find nearby enemies
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
+
+        // Second step: Find the best attack places considering all nearby enemies
         GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
             targetEnemy,
-            new List<Unit> { targetEnemy },
+            new List<Unit>(nearbyEnemies),
             currentUnit.type
         );
 
