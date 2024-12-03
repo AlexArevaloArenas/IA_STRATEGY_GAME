@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 // TODO Migrate Strategies, Beliefs, Actions and Goals to Scriptable Objects and create Node Editor for them
 public interface IActionStrategy
@@ -24,30 +25,83 @@ public interface IActionStrategy
     }
 }
 
-public class AttackStrategy : IActionStrategy
+//MOVE TO ATTACK POSITION
+
+public class MoveToAttackPositionStrategy : IActionStrategy
 {
-    public bool CanPerform => true; // Agent can always attack
-    public bool Complete { get; private set; }
+    readonly Unit currentUnit;
+    readonly Unit targetEnemy;
+    bool complete;
 
-    readonly CountdownTimer timer;
-    readonly AnimationController animations;
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
 
-    public AttackStrategy(AnimationController animations)
+    public MoveToAttackPositionStrategy(Unit currentUnit, Unit targetEnemy)
     {
-        this.animations = animations;
-        timer = new CountdownTimer(animations.GetAnimationLength(animations.attackClip));
-        timer.OnTimerStart += () => Complete = false;
-        timer.OnTimerStop += () => Complete = true;
+        this.currentUnit = currentUnit;
+        this.targetEnemy = targetEnemy;
     }
 
     public void Start()
     {
-        timer.Start();
-        animations.Attack();
+        GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
+            targetEnemy,
+            new List<Unit> { targetEnemy },
+            currentUnit.type
+        );
+
+        if (bestAttackPlaces.Length > 0) //moves to the best attack place
+        {
+            currentUnit.GetComponent<Agent>().GoTo(bestAttackPlaces[0].worldPosition);
+        }
+        else
+        {
+            complete = true;
+        }
     }
 
-    public void Update(float deltaTime) => timer.Tick(deltaTime);
+    public void Update(float deltaTime)
+    {
+        if (currentUnit.GetComponent<Agent>().HasReachedDestination())
+        {
+            complete = true;
+        }
+    }
+
+    public void Stop()
+    {
+        complete = true;
+    }
 }
+
+//ATTACK ENEMY TARGET
+public class AttackStrategy : IActionStrategy
+{
+    readonly Unit currentUnit;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+    public AttackStrategy(Unit currentUnit)
+    {
+        this.currentUnit = currentUnit;
+    }
+
+    public void Start()
+    {
+        currentUnit.Attack(currentUnit.GetComponent<Agent>().target); //attacks
+        complete = true;
+        //TO DO: GameManager next turn
+    }
+
+    public void Update(float deltaTime) { }
+
+    public void Stop() { }
+}
+
+
+
 
 public class MoveStrategy : IActionStrategy
 {

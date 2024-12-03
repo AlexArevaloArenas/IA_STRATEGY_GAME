@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEditor.Experimental.GraphView;
+using System.Collections.Generic;
 
 public class Agent : MonoBehaviour
 {
@@ -142,7 +143,19 @@ public class Agent : MonoBehaviour
         }
     }
 
+
     //Usable Methods
+
+    public bool HasPath() //new
+    {
+        return path != null;
+    }
+
+    public bool HasReachedDestination() //new
+    {
+        return path != null && path.finishLineIndex == path.turnBoundaries.Length - 1;
+    }
+
     public void GoTo(Vector3 where)
     {
         target.transform.position = where;
@@ -153,6 +166,18 @@ public class Agent : MonoBehaviour
     public Unit[] EnemiesAvailable()
     {
         return PathRequestManager.FindEnemiesAvailable(transform.position, GetComponent<Unit>().MoveRange, GetComponent<Unit>().AttackRange);
+    }
+
+    //new functions for findbestattack and findsafeplaces
+
+    public GridNode[] FindBestAttackPlaces(Unit targetUnit, List<Unit> enemies, UnitType unitType)
+    {
+        return PathRequestManager.FindBestAttackPlaces(transform.position, GetComponent<Unit>().MoveRange, targetUnit, enemies, unitType);
+    }
+
+    public GridNode[] FindSafePlaces(List<Unit> enemies)
+    {
+        return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies);
     }
 
 }

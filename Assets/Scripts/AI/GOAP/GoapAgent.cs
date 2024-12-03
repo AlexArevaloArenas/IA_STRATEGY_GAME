@@ -70,6 +70,7 @@ public class GoapAgent : MonoBehaviour
         beliefs = new Dictionary<string, AgentBelief>();
         BeliefFactory factory = new BeliefFactory(this, beliefs);
 
+        /*
         factory.AddBelief("Nothing", () => false);
 
         factory.AddBelief("AgentIdle", () => !navMeshAgent.hasPath);
@@ -87,6 +88,11 @@ public class GoapAgent : MonoBehaviour
         factory.AddSensorBelief("PlayerInChaseRange", chaseSensor);
         factory.AddSensorBelief("PlayerInAttackRange", attackSensor);
         factory.AddBelief("AttackingPlayer", () => false); // Player can always be attacked, this will never become true
+        */
+
+        // New beliefs
+        factory.AddBelief("CanMoveToAttackPosition", () => currentUnit.GetComponent<Agent>().HasPath());
+        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && Vector3.Distance(currentUnit.transform.position, enemyUnit.transform.position) <= currentUnit.AttackRange);
     }
 
     void SetupActions()
@@ -98,20 +104,23 @@ public class GoapAgent : MonoBehaviour
             .AddEffect(beliefs["Nothing"])
             .Build());
 
-            /*
+            
 
         actions.Add(new AgentAction.Builder("MoveToAttackPosition")
             .WithStrategy(new MoveToAttackPositionStrategy(currentUnit, enemyUnit))
             .AddPrecondition(beliefs["PlayerInChaseRange"])
-            .AddEffect(beliefs["PlayerInAttackRange"])
+            //.AddEffect(beliefs["PlayerInAttackRange"])
+            .AddEffect(beliefs["CanMoveToAttackPosition"])
             .Build());
 
         actions.Add(new AgentAction.Builder("AttackPlayer")
             .WithStrategy(new AttackStrategy(currentUnit))
-            .AddPrecondition(beliefs["PlayerInAttackRange"])
-            .AddEffect(beliefs["AttackingPlayer"])
+            //.AddPrecondition(beliefs["PlayerInAttackRange"])
+            .AddPrecondition(beliefs["CanMoveToAttackPosition"])
+            //.AddEffect(beliefs["AttackingPlayer"])
+            .AddEffect(beliefs["CanAttackEnemy"])
             .Build());
-            */
+            
 
         
     }
@@ -122,7 +131,7 @@ public class GoapAgent : MonoBehaviour
 
         goals.Add(new AgentGoal.Builder("AttackEnemyTarget")
             .WithPriority(3)
-            .WithDesiredEffect(beliefs["AttackingPlayer"])
+            .WithDesiredEffect(beliefs["CanAttackEnemy"])
             .Build());
     }
 
