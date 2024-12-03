@@ -158,15 +158,114 @@ public class Pathfinding : MonoBehaviour {
 
     }
 
-	public void FindSafePlaces(GridNode node, float range, List<Unit> enemies, bool[,] revisedNodeMatrix)
-	{
+	public GridNode[] GetSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix)
+{
+    List<GridNode> safePlaces = new List<GridNode>();
+    float minDamage = Mathf.Infinity; 
 
+    FindSafePlaces(node, moveRange, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
+
+    return safePlaces.ToArray();
+}
+
+private void FindSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix, ref List<GridNode> safePlaces, ref float minDamage)
+{
+    if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
+    {
+        revisedNodeMatrix[node.gridX, node.gridY] = true;
+
+        float damage = CalculatePotentialDamage(node, enemies);
+
+        if (damage < minDamage) // New minimum damage
+        {
+            minDamage = damage;
+            safePlaces.Clear();
+            safePlaces.Add(node);
+        }
+        else if (damage == minDamage) // Same damage as minimum
+        {
+            safePlaces.Add(node);
+        }
+
+        List<GridNode> neighbors = grid.GetNeighbours(node);
+        neighbors.Sort((a, b) => b.worldPosition.y.CompareTo(a.worldPosition.y)); // Prioritize higher Y nodes
+
+        foreach (GridNode nn in neighbors)
+        {
+            float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
+            FindSafePlaces(nn, moveRange - distance, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
+        }
+    }
+}
+
+	private float CalculatePotentialDamage(GridNode node, List<Unit> enemies) //raycast from enemy to player
+	{
+		float totalDamage = 0f;
+
+		foreach (Unit enemy in enemies)
+		{
+			Vector3 direction = (enemy.transform.position - node.worldPosition).normalized;
+			if (Physics.Raycast(enemy.transform.position, direction, enemy.AttackRange, playerUnits))
+			{
+				totalDamage += enemy.AttackDamage;
+			}
+		}
+
+		return totalDamage;
 	}
 
-    public void FindBestAttackPlace(GridNode node, float range, List<Unit> enemies, bool[,] revisedNodeMatrix)
-    {
+	public GridNode[] GetBestAttackPlaces(GridNode node, float moveRange, Unit targetUnit, List<Unit> enemies, bool[,] revisedNodeMatrix, UnitType unitType)
+	{
+		List<GridNode> bestAttackPlaces = new List<GridNode>();
+		float minDamage = Mathf.Infinity;
 
-    }
+		FindBestAttackPlace(node, moveRange, targetUnit, enemies, revisedNodeMatrix, ref bestAttackPlaces, ref minDamage, unitType);
+
+		return bestAttackPlaces.ToArray();
+	}
+
+    private void FindBestAttackPlace(GridNode node, float moveRange, Unit targetUnit, List<Unit> enemies, bool[,] revisedNodeMatrix, ref List<GridNode> bestAttackPlaces, ref float minDamage, UnitType unitType)
+	{
+		if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
+		{
+			revisedNodeMatrix[node.gridX, node.gridY] = true;
+
+			float damage = CalculatePotentialDamage(node, enemies); //Same as safe places
+
+			if (CanAttackTarget(node, targetUnit) && damage < minDamage) //new minimum damage (take damage from enemy)
+			{
+				minDamage = damage;
+				bestAttackPlaces.Clear();
+				bestAttackPlaces.Add(node);
+			}
+			else if (CanAttackTarget(node, targetUnit) && damage == minDamage) //another minimum damage
+			{
+				bestAttackPlaces.Add(node);
+			}
+
+			List<GridNode> neighbors = grid.GetNeighbours(node);
+			if (unitType != UnitType.Knight) //If unit is knight, it makes no sense to attack from above
+			{
+				neighbors.Sort((a, b) => b.worldPosition.y.CompareTo(a.worldPosition.y)); // Prioritize higher Y nodes
+			}
+
+			foreach (GridNode nn in neighbors)
+			{
+				float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
+				FindBestAttackPlace(nn, moveRange - distance, targetUnit, enemies, revisedNodeMatrix, ref bestAttackPlaces, ref minDamage, unitType);
+			}
+		}
+
+		
+	}
+
+	private bool CanAttackTarget(GridNode node, Unit targetUnit)
+	{
+		Vector3 direction = (targetUnit.transform.position - node.worldPosition).normalized;
+		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, enemyUnits);
+	}
+
+	
 
 
 }
