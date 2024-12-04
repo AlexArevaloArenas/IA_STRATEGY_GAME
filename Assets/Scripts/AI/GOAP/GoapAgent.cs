@@ -64,10 +64,10 @@ public class GoapAgent : MonoBehaviour
     void Start()
     {
         SetupGOAP();
-        allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
-        enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
+        
     }
 
+    //This function is called EVERY TURN AI PLAYS 
     public void SetupGOAP(){
 
         SetupTimers();
@@ -75,6 +75,10 @@ public class GoapAgent : MonoBehaviour
         SetupActions();
         SetupGoals();
         
+        allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
+        enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
+        enemyUnit = SelectMostDangerousUnit(allies, enemies);
+        currentUnit = SelectCurrentUnit(enemyUnit, allies);
         
     }
 
@@ -167,7 +171,7 @@ public class GoapAgent : MonoBehaviour
         health = Mathf.Clamp(health, 0, 100);
     }
 
-    bool InRangeOf(Vector3 pos, float range) => Vector3.Distance(transform.position, pos) < range;
+    bool InRangeOf(Vector3 pos, float range) => Vector3.Distance(currentUnit.transform.position, pos) < range;
 
     void OnEnable() => chaseSensor.OnTargetChanged += HandleTargetChanged;
     void OnDisable() => chaseSensor.OnTargetChanged -= HandleTargetChanged;
@@ -180,6 +184,59 @@ public class GoapAgent : MonoBehaviour
         currentGoal = null;
     }
 
+    void Update(){
+        statsTimer.Tick(Time.deltaTime);
+
+        // Update the plan and current action if there is one
+        if (currentAction == null)
+        {
+            Debug.Log("Calculating any potential new plan");
+            CalculatePlan();
+
+            if (actionPlan != null && actionPlan.Actions.Count > 0)
+            {
+                currentGoal = actionPlan.AgentGoal;
+                Debug.Log($"Goal: {currentGoal.Name} with {actionPlan.Actions.Count} actions in plan");
+                currentAction = actionPlan.Actions.Pop();
+                Debug.Log($"Popped action: {currentAction.Name}");
+                // Verify all precondition effects are true
+                if (currentAction.Preconditions.All(b => b.Evaluate()))
+                {
+                    currentAction.Start();
+                }
+                else
+                {
+                    Debug.Log("Preconditions not met, clearing current action and goal");
+                    currentAction = null;
+                    currentGoal = null;
+                }
+            }
+
+            
+        }
+
+            // If we have a current action, execute it
+        if (actionPlan != null && currentAction != null)
+        {
+            currentAction.Update(Time.deltaTime);
+
+            if (currentAction.Complete)
+            {
+                Debug.Log($"{currentAction.Name} complete");
+                currentAction.Stop();
+                currentAction = null;
+
+                if (actionPlan.Actions.Count == 0)
+                {
+                    Debug.Log("Plan complete");
+                    lastGoal = currentGoal;
+                    currentGoal = null;
+                }
+            }
+        }
+    }
+
+    /* UPDATE WITH NAVMESH AGENT
     void Update()
     {
         statsTimer.Tick(Time.deltaTime);
@@ -233,6 +290,8 @@ public class GoapAgent : MonoBehaviour
             }
         }
     }
+
+    */
 
     void CalculatePlan()
     {
