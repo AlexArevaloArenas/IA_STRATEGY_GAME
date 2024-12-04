@@ -6,8 +6,8 @@ public class GameManager : MonoBehaviour {
 
     public static GameManager Instance { get; private set; }
     int state = -1;
-    GameObject[] playerTeam;
-    GameObject[] enemyTeam;
+    public Unit[] playerTeam;
+    public Unit[] enemyTeam;
     public bool acabado = false;
     bool victory = false;
     public bool isPlayerTurn;

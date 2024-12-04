@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DependencyInjection; // https://github.com/adammyhre/Unity-Dependency-Injection-Lite
@@ -32,6 +33,9 @@ public class GoapAgent : MonoBehaviour
     Unit currentUnit;
     Unit enemyUnit;
 
+    List<Unit> allies;
+    List<Unit> enemies;
+
     GameObject target;
     Vector3 destination;
 
@@ -59,10 +63,19 @@ public class GoapAgent : MonoBehaviour
 
     void Start()
     {
+        SetupGOAP();
+        allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
+        enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
+    }
+
+    public void SetupGOAP(){
+
         SetupTimers();
         SetupBeliefs();
         SetupActions();
         SetupGoals();
+        
+        
     }
 
     void SetupBeliefs()
@@ -240,4 +253,89 @@ public class GoapAgent : MonoBehaviour
             actionPlan = potentialPlan;
         }
     }
+
+    private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies)
+    {
+        if (enemies == null || enemies.Count == 0)
+        {
+            return null;
+        }
+
+        bool isAggressive = allies.Count < enemies.Count; // If we have less allies than enemies, AI plays agressive
+
+        if (isAggressive)
+        {
+            // Select the enemy with the highest damage and lowest health
+            return enemies.OrderByDescending(e => e.AttackDamage)
+                          .ThenBy(e => e.GetHealth())
+                          .FirstOrDefault();
+        }
+        else
+        {
+            // Select the enemy with less than 50% health, or the one with the highest health and damage
+            return enemies.OrderBy(e => e.GetHealth() < e.MaxHealth * 0.5f ? 0 : 1)
+                          .ThenBy(e => e.GetHealth() < e.MaxHealth * 0.5f ? e.GetHealth() : -e.GetHealth())
+                          .ThenByDescending(e => e.AttackDamage)
+                          .FirstOrDefault();
+        }
+    }
+
+    private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
+    {
+
+        List<Unit> strongestUnits = new List<Unit>();
+        Unit selectedUnit = null;
+
+        switch(currentEnemy.type){
+
+            case UnitType.Archer:
+                strongestUnits = allies.Where(u => u.type == UnitType.Knight).ToList();
+                break;
+
+            case UnitType.Mage:
+                strongestUnits = allies.Where(u => u.type == UnitType.Archer).ToList();
+                break;
+
+            case UnitType.Knight:
+                strongestUnits = allies.Where(u => u.type == UnitType.Mage).ToList();
+                break;
+
+            default:
+                strongestUnits = allies.Where(u => u.type == UnitType.Pawn).ToList();
+                break;
+        }
+            selectedUnit = CalculateViableEnemy(strongestUnits, currentEnemy);
+
+            // If no strongest unit is found, select a Pawn
+            if (selectedUnit == null)
+            {
+                selectedUnit = allies
+                    .Where(u => u.type == UnitType.Pawn)
+                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
+                    .FirstOrDefault();
+            }
+
+            // If no Pawn is found, select the closest weaker unit
+            if (selectedUnit == null)
+            {
+                selectedUnit = allies
+                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
+                    .FirstOrDefault();
+            }
+            
+        
+        return selectedUnit;
+    }
+
+    private Unit CalculateViableEnemy(List<Unit> allies, Unit currentEnemy){
+        
+        // Select the strongest unit that has more than 40% health
+        Unit selectedUnit = allies.Where(u => u.GetHealth() > u.MaxHealth * 0.4f)
+                                  .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
+                                  .FirstOrDefault();
+
+        return selectedUnit;
+    }
+
+
 }
