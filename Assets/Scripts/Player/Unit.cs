@@ -36,7 +36,7 @@ public class Unit : MonoBehaviour
         GameManager.Instance.EndUnitAction();
     }
 
-    public void Attack(GameObject enemy)
+    public void Attack(Unit enemy)
     {
         Vector3 direction = (transform.position - enemy.transform.position).normalized;
         if (Physics.Raycast(transform.position, direction, AttackRange))

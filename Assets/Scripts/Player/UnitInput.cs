@@ -58,7 +58,7 @@ public class UnitInput : MonoBehaviour
                 {
                     if (hit.collider.GetComponent<Unit>().team == "Enemy")
                     {
-                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject);
+                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.GetComponent<Unit>());
                         Debug.Log("Pepe Atacuela");
                     }
                     

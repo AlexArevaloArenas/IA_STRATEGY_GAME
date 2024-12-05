@@ -84,19 +84,21 @@ public class MoveToAttackPositionStrategy : IActionStrategy
 public class AttackStrategy : IActionStrategy
 {
     readonly Unit currentUnit;
+    readonly Unit targetEnemy;
     bool complete;
 
     public bool CanPerform => !complete;
     public bool Complete => complete;
 
-    public AttackStrategy(Unit currentUnit)
+    public AttackStrategy(Unit currentUnit, Unit targetEnemy)
     {
         this.currentUnit = currentUnit;
+        this.targetEnemy = targetEnemy;
     }
 
     public void Start()
     {
-        currentUnit.Attack(currentUnit.GetComponent<Agent>().target); //attacks
+        currentUnit.Attack(targetEnemy); //attacks
         complete = true;
         //TO DO: GameManager next turn
     }

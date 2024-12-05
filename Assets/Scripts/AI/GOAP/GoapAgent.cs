@@ -131,7 +131,7 @@ public class GoapAgent : MonoBehaviour
             .Build());
 
         actions.Add(new AgentAction.Builder("AttackPlayer")
-            .WithStrategy(new AttackStrategy(currentUnit))
+            .WithStrategy(new AttackStrategy(currentUnit, enemyUnit))
             //.AddPrecondition(beliefs["PlayerInAttackRange"])
             .AddPrecondition(beliefs["CanMoveToAttackPosition"])
             //.AddEffect(beliefs["AttackingPlayer"])
