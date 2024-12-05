@@ -61,10 +61,11 @@ PrefabInstance:
     - target: {fileID: 6109580217449508614, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
         type: 3}
       propertyPath: m_Name
-      value: PlayerUnit Variant
+      value: PlayerMage
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5041846962432395350, guid: 84a51abe40b10e1458cc3c4ff54c90d0, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 84a51abe40b10e1458cc3c4ff54c90d0, type: 3}

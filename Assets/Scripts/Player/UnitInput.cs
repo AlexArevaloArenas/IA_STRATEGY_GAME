@@ -40,29 +40,30 @@ public class UnitInput : MonoBehaviour
 
         */
 
-        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count>0 && GameManager.Instance.isPlayerTurn==true) // When released
+        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count >0 && GameManager.Instance.isPlayerTurn==true) // When released
         {
-            Debug.Log("Pepe Viyuela");
+            //Debug.Log("Pepe Viyuela");
             RaycastHit hit;
             Ray ray = myCam.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                Debug.Log(hit.collider.gameObject);
-                Debug.Log("Pepe Castañuela 1");
+                //Debug.Log(hit.collider.gameObject);
+                //Debug.Log("Pepe Castañuela 1");
                 if (hit.collider.gameObject.layer== LayerMask.NameToLayer("Ground"))
                 {
-                    Debug.Log("Pepe Castañuela 2");
+                    //Debug.Log("Pepe Castañuela 2");
                     selections.unitSelected[0].GetComponent<Unit>().Move(new Vector3(hit.point.x, hit.point.y, hit.point.z));
                     
                 }
 
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Unit"))
                 {
-                    if (hit.collider.GetComponent<Unit>().team == "Enemy")
+                    Debug.Log(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team);
+                    if (hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Enemy")
                     {
                         Debug.Log("Pepe Atacuela");
-                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.GetComponent<Unit>());
+                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.transform.parent.GetComponent<Unit>());
                         
                     }
                     

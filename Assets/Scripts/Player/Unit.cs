@@ -38,32 +38,104 @@ public class Unit : MonoBehaviour
 
     public void Attack(Unit enemy)
     {
-        Vector3 direction = (transform.position - enemy.transform.position).normalized;
-        if (Physics.Raycast(transform.position, direction, AttackRange))
+        Debug.Log("Voy a intentar atacar!!");
+        //Vector3 direction = (enemy.transform.position - transform.position ).normalized;
+        //LayerMask.NameToLayer("Unit"))
+        //Physics.Raycast(transform.position, direction, AttackRange, LayerMask.NameToLayer("Unit"))
+        if (Vector3.Distance(transform.position,enemy.transform.position) < AttackRange)
         {
             UnitType enemytype = enemy.GetComponent<Unit>().type;
-            switch (enemytype) {
+            Debug.Log("Ataco!!");
+            switch (type)
+            {
                 case UnitType.Mage:
+                    float heightMultiplier = 1;
+                    if (transform.position.y> enemy.transform.position.y){
+                        heightMultiplier = 1.5f;
+                    }
+                    switch (enemytype)
+                    {
+                        case UnitType.Mage:
+                            enemy.GetDamage(AttackDamage* heightMultiplier);
+                            break;
+                        case UnitType.Knight:
+                            enemy.GetDamage(AttackDamage*2* heightMultiplier);
+                            break;
+                        case UnitType.Archer:
+                            enemy.GetDamage((AttackDamage * heightMultiplier) / 2);
+                            break;
+                        case UnitType.Pawn:
+                            enemy.GetDamage(AttackDamage * heightMultiplier);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case UnitType.Knight:
+                    switch (enemytype)
+                    {
+                        case UnitType.Mage:
+                            
+                            enemy.GetDamage((AttackDamage) / 2);
+                            break;
+                        case UnitType.Knight:
+                            enemy.GetDamage(AttackDamage);
+                            break;
+                        case UnitType.Archer:
+                            
+                            enemy.GetDamage(AttackDamage * 2);
+                            break;
+                        case UnitType.Pawn:
+                            enemy.GetDamage(AttackDamage);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case UnitType.Archer:
+                    float heightMultiplier3 = 1;
+                    if (transform.position.y > enemy.transform.position.y)
+                    {
+                        heightMultiplier = 1.5f;
+                    }
+                    switch (enemytype)
+                    {
+                        case UnitType.Mage:
+                            enemy.GetDamage(AttackDamage * 2 * heightMultiplier3);
+                            break;
+                        case UnitType.Knight:
+                            
+                            enemy.GetDamage((AttackDamage * heightMultiplier3) / 2);
+                            break;
+                        case UnitType.Archer:
+                            enemy.GetDamage(AttackDamage * heightMultiplier3);
+                            
+                            break;
+                        case UnitType.Pawn:
+                            enemy.GetDamage(AttackDamage * heightMultiplier3);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case UnitType.Pawn:
+                    enemy.GetDamage(AttackDamage);
                     break;
                 default:
                     break;
 
             }
+
             GameManager.Instance.EndUnitAction();
         }
     }
 
     public void GetDamage(float damage)
     {
+        Debug.Log("Me atacan!!");
         currentHealth -= damage;
         if (currentHealth < 0) {
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
 
