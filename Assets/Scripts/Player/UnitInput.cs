@@ -48,18 +48,22 @@ public class UnitInput : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                if (hit.collider.gameObject.layer== terrain)
+                Debug.Log(hit.collider.gameObject);
+                Debug.Log("Pepe Castañuela 1");
+                if (hit.collider.gameObject.layer== LayerMask.NameToLayer("Ground"))
                 {
+                    Debug.Log("Pepe Castañuela 2");
                     selections.unitSelected[0].GetComponent<Unit>().Move(new Vector3(hit.point.x, hit.point.y, hit.point.z));
-                    Debug.Log("Pepe Castañuela");
+                    
                 }
 
-                if (hit.collider.gameObject.layer == unit)
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Unit"))
                 {
                     if (hit.collider.GetComponent<Unit>().team == "Enemy")
                     {
-                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.GetComponent<Unit>());
                         Debug.Log("Pepe Atacuela");
+                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.GetComponent<Unit>());
+                        
                     }
                     
                 }

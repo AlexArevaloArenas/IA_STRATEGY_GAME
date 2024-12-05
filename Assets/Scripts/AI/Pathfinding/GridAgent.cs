@@ -21,6 +21,7 @@ public class Agent : MonoBehaviour
 
     void Start()
     {
+        target = transform.position;
         StartCoroutine(UpdatePath());
     }
 
