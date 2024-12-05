@@ -12,6 +12,9 @@ public class UnitInput : MonoBehaviour
 
     private UnitSelections selections;
     public LayerMask terrain;
+    public LayerMask unit;
+  
+
 
     private void Start()
     {
@@ -37,16 +40,29 @@ public class UnitInput : MonoBehaviour
 
         */
 
-        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count>0) // When released
+        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count>0 && GameManager.Instance.isPlayerTurn==true) // When released
         {
             Debug.Log("Pepe Viyuela");
             RaycastHit hit;
             Ray ray = myCam.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                selections.unitSelected[0].GetComponent<Unit>().Move(new Vector3(hit.point.x, hit.point.y, hit.point.z));
-                Debug.Log("Pepe Castañuela");
+                if (hit.collider.gameObject.layer== terrain)
+                {
+                    selections.unitSelected[0].GetComponent<Unit>().Move(new Vector3(hit.point.x, hit.point.y, hit.point.z));
+                    Debug.Log("Pepe Castañuela");
+                }
+
+                if (hit.collider.gameObject.layer == unit)
+                {
+                    if (hit.collider.GetComponent<Unit>().team == "Enemy")
+                    {
+                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject);
+                        Debug.Log("Pepe Atacuela");
+                    }
+                    
+                }
             }
             
         }

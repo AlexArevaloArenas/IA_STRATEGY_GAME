@@ -17,6 +17,8 @@ public class Unit : MonoBehaviour
     public float AttackRange;
     public float MoveRange;
 
+    public string team;
+
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
@@ -31,6 +33,7 @@ public class Unit : MonoBehaviour
     public void Move(Vector3 punto)
     {
         pathfindingAgent.GoTo(punto);
+        GameManager.Instance.EndUnitAction();
     }
 
     public void Attack(GameObject enemy)
@@ -52,6 +55,7 @@ public class Unit : MonoBehaviour
                     break;
 
             }
+            GameManager.Instance.EndUnitAction();
         }
     }
 

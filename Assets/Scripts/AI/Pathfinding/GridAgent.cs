@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 public class Agent : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class Agent : MonoBehaviour
     const float minPathUpdateTime = .2f;
     const float pathUpdateMoveThreshold = .5f;
 
-    public GameObject target;
+    public Vector3 target;
     public GameObject sprite;
     public float speed = 20;
     public float turnSpeed = 3;
@@ -41,19 +42,19 @@ public class Agent : MonoBehaviour
         {
             yield return new WaitForSeconds(.3f);
         }
-        PathRequestManager.RequestPath(new PathRequest(transform.position, target.transform.position, OnPathFound));
+        PathRequestManager.RequestPath(new PathRequest(transform.position, target, OnPathFound));
 
         float sqrMoveThreshold = pathUpdateMoveThreshold * pathUpdateMoveThreshold;
-        Vector3 targetPosOld = target.transform.position;
+        Vector3 targetPosOld = target;
 
         while (true)
         {
             yield return new WaitForSeconds(minPathUpdateTime);
             //print(((target.position - targetPosOld).sqrMagnitude) + "    " + sqrMoveThreshold);
-            if ((target.transform.position - targetPosOld).sqrMagnitude > sqrMoveThreshold)
+            if ((target - targetPosOld).sqrMagnitude > sqrMoveThreshold)
             {
-                PathRequestManager.RequestPath(new PathRequest(transform.position, target.transform.position, OnPathFound));
-                targetPosOld = target.transform.position;
+                PathRequestManager.RequestPath(new PathRequest(transform.position, target, OnPathFound));
+                targetPosOld = target;
             }
         }
     }
@@ -175,7 +176,7 @@ public class Agent : MonoBehaviour
 
     public void GoTo(Vector3 where)
     {
-        target.transform.position = where;
+        target = where;
         StartCoroutine(UpdatePath());
     }
 

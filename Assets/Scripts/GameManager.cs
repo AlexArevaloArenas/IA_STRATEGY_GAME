@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    public static GameManager Instance { get; private set; }
+    
     int state = -1;
     public Unit[] playerTeam;
     public Unit[] enemyTeam;
@@ -15,12 +15,10 @@ public class GameManager : MonoBehaviour {
     public int unitsUsed;
     int teamSize;
 
+    public GoapAgent GoapAgent { get; private set; }
+
     public GameObject canvasPrefab;
-
-    void Start() {
-        Time.timeScale = 1;
-    }
-
+    public static GameManager Instance { get; private set; }
     void Awake()
     {
         if (!Instance)
@@ -32,6 +30,11 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
+    }
+
+
+    void Start() {
+        Time.timeScale = 1;
     }
 
     void Update() {
@@ -69,16 +72,13 @@ public class GameManager : MonoBehaviour {
             //Mostrar cosas del canvas
         }
 
-        if (unitsUsed>= unitsPerTurn){
-            isPlayerTurn = !isPlayerTurn;
-            unitsUsed = 0;
-        }
-
         if (isPlayerTurn){
             //el jugador puede seleccionar lo que quiera, hay que incluir que al seleccionar el ataque de una unidad no se pueda seleccionar ya, y se haga un unitsUsed++
+
         } 
         else {
             //que la Ia haga sus cosas de GOAP e historias, cuando haga el ataque con una unidad, hay que hacer que no pueda hacer nada con esa en este turno, y que se haga un unitsUsed++
+            GoapAgent.SetupGOAP();
         }
             
         statCheck();
@@ -148,6 +148,16 @@ public class GameManager : MonoBehaviour {
 
         
         
+    }
+
+    public void EndUnitAction()
+    {
+        unitsUsed += 1;
+        if (unitsUsed >= unitsPerTurn)
+        {
+            isPlayerTurn = !isPlayerTurn;
+            unitsUsed = 0;
+        }
     }
 
 }
