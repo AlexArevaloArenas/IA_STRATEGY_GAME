@@ -25,7 +25,127 @@ public interface IActionStrategy
     }
 }
 
-//MOVE TO ATTACK POSITION
+//MOVE TO ENEMY DIRECTION
+
+public class MoveToEnemyStrategy : IActionStrategy
+{
+    readonly Unit currentUnit;
+    readonly Unit targetEnemy;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+    public MoveToEnemyStrategy(Unit currentUnit, Unit targetEnemy)
+    {
+        this.currentUnit = currentUnit;
+        this.targetEnemy = targetEnemy;
+    }
+
+    public void Start()
+    {
+        // First step: Find nearby enemies
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
+
+        // Second step: Find the best safe places considering all nearby enemies
+        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
+            new List<Unit>(nearbyEnemies)
+        );
+
+        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        {
+            float minDistance = Mathf.Infinity;
+            int count = 0;
+
+            for(int i = 0; i < bestSafePlaces.Length; i++)
+            {
+                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, currentUnit.transform.position);
+                if(distance < minDistance)
+                {
+                    minDistance = distance;
+                    count = i;
+
+                }
+            }
+
+            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+        }
+        else
+        {
+            complete = true;
+        }
+    }
+
+
+}
+
+//FLEE FROM ENEMY DIRECTION
+
+public class FleeFromEnemyStrategy : IActionStrategy
+{
+    readonly Unit currentUnit;
+    readonly Unit targetEnemy;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+    public FleeFromEnemyStrategy(Unit currentUnit, Unit targetEnemy)
+    {
+        this.currentUnit = currentUnit;
+        this.targetEnemy = targetEnemy;
+    }
+
+    public void Start()
+    {
+        // First step: Find nearby enemies
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
+
+        // Second step: Find the best safe places considering all nearby enemies
+        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
+            new List<Unit>(nearbyEnemies)
+        );
+
+        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        {
+            float maxDistance = 0f;
+            int count = 0;
+
+            for (int i = 0; i < bestSafePlaces.Length; i++)
+            {
+                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, currentUnit.transform.position);
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    count = i;
+
+                }
+            }
+
+            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+        }
+        else
+        {
+            complete = true;
+        }
+    }
+
+
+}
+
+
+
+
+
+
+
+
 
 public class MoveToAttackPositionStrategy : IActionStrategy
 {
