@@ -63,23 +63,27 @@ public class GoapAgent : MonoBehaviour
 
     void Start()
     {
+        
         SetupGOAP();
         
     }
-
-    //This function is called EVERY TURN AI PLAYS 
-    public void SetupGOAP(){
+ 
+    void SetupGOAP(){ //Adds one single time to belief, action and goal list (Start from GOAP script)
 
         SetupTimers();
         SetupBeliefs();
         SetupActions();
         SetupGoals();
         
+    }
+
+    public void TurnStart()     //This function is called EVERY TURN AI PLAYS
+    {
+        ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
         allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
         enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
         enemyUnit = SelectMostDangerousUnit(allies, enemies);
         currentUnit = SelectCurrentUnit(enemyUnit, allies);
-        
     }
 
     void SetupBeliefs()
@@ -173,13 +177,24 @@ public class GoapAgent : MonoBehaviour
 
     bool InRangeOf(Vector3 pos, float range) => Vector3.Distance(currentUnit.transform.position, pos) < range;
 
+
+    /*
     void OnEnable() => chaseSensor.OnTargetChanged += HandleTargetChanged;
     void OnDisable() => chaseSensor.OnTargetChanged -= HandleTargetChanged;
+
+
 
     void HandleTargetChanged()
     {
         Debug.Log("Target changed, clearing current action and goal");
         // Force the planner to re-evaluate the plan
+        currentAction = null;
+        currentGoal = null;
+    }
+    */
+
+    void ResetGOAP()
+    {
         currentAction = null;
         currentGoal = null;
     }
@@ -207,8 +222,7 @@ public class GoapAgent : MonoBehaviour
                 else
                 {
                     Debug.Log("Preconditions not met, clearing current action and goal");
-                    currentAction = null;
-                    currentGoal = null;
+                    ResetGOAP();
                 }
             }
 
