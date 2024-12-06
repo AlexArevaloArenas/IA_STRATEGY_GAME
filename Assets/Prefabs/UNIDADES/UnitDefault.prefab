@@ -128,6 +128,7 @@ GameObject:
   - component: {fileID: 2770777332962609164}
   - component: {fileID: 2297676470574360773}
   - component: {fileID: 3830979491854176653}
+  - component: {fileID: -7303489877690588650}
   m_Layer: 8
   m_Name: UnitDefault
   m_TagString: Untagged
@@ -164,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba05c0b7257fe6458ce725f8651cc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
   sprite: {fileID: 0}
   speed: 3
   turnSpeed: 3
@@ -197,6 +198,7 @@ MonoBehaviour:
   visible: 0
   type: 0
   MaxHealth: 0
+  currentHealth: 0
   AttackDamage: 0
   AttackRange: 0
   MoveRange: 0
@@ -204,6 +206,21 @@ MonoBehaviour:
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 
+--- !u!114 &-7303489877690588650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7548666648926665835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 985add12ee4836e40b7241671b1d892c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fogWar: {fileID: 0}
+  visibility: 0
+  additionalRadius: 0
 --- !u!1 &7619714614407294800
 GameObject:
   m_ObjectHideFlags: 0

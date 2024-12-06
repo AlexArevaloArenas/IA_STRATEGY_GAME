@@ -1,3 +1,4 @@
+using FischlWorks_FogWar;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,13 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
     
-    int state = -1;
+    int state = 0;
     public List<Unit> playerTeam;
     public List<Unit> enemyTeam;
+
+    public List<Unit> visibleAlivePlayerTeam;
+    public List<Unit> visibleAliveEnemyTeam;
+
     public bool acabado = false;
     bool victory = false;
     public bool isPlayerTurn;
@@ -21,6 +26,7 @@ public class GameManager : MonoBehaviour {
     public GoapAgent GoapAgent { get; private set; }
 
     public GameObject canvasPrefab;
+    public csFogWar fogWar = null;
     public static GameManager Instance { get; private set; }
     void Awake()
     {
@@ -38,6 +44,17 @@ public class GameManager : MonoBehaviour {
 
     void Start() {
         Time.timeScale = 1;
+        try
+        {
+            fogWar = GameObject.Find("FogWar").GetComponent<csFogWar>();
+
+        }
+        catch
+        {
+            Debug.LogErrorFormat("Failed to fetch csFogWar component. " +
+                "Please rename the gameobject that the module is attachted to as \"FogWar\", " +
+                "or change the implementation located in the csFogVisibilityAgent.cs script.");
+        }
     }
 
     void Update() {
@@ -57,9 +74,9 @@ public class GameManager : MonoBehaviour {
         if (Random.Range(0,1) == 0) isPlayerTurn = true;
         else isPlayerTurn = false;
         unitUsed = 0;
-        state = 1;
         }
         */
+        state = 1;
     }
 
     void runGame() {
@@ -100,6 +117,7 @@ public class GameManager : MonoBehaviour {
 
     void GeneraEquipos()
     {
+        /*
         int r = -1;
         for (int i = 0; i<teamSize;i++){
             if (i >teamSize/2 && teamSize > 3){
@@ -137,14 +155,17 @@ public class GameManager : MonoBehaviour {
                     case 2: {
                         //enemyTeam[i] = arquero
                         break;
-                    } 
+                    }
                 }
             }
             //playerTeam[i].position = ;
             //enemyTeam[i].position = ;
         }
-
-
+        */
+        foreach (Unit u in playerTeam)
+        {
+            fogWar.AddFogExternal(u);
+        }
     }    
     
     void statCheck() {
@@ -160,6 +181,25 @@ public class GameManager : MonoBehaviour {
         {
             isPlayerTurn = !isPlayerTurn;
             unitsUsed = 0;
+        }
+    }
+
+    public void TeamCheck()
+    {
+        visibleAlivePlayerTeam.Clear();
+        visibleAliveEnemyTeam.Clear();
+
+        foreach (Unit u in playerTeam) {
+            if (u.currentHealth>0 && u.visible)
+            {
+                visibleAlivePlayerTeam.Add(u);
+            } 
+        }
+        foreach (Unit u in enemyTeam) {
+            if (u.currentHealth > 0 && u.visible)
+            {
+                visibleAliveEnemyTeam.Add(u);
+            }            
         }
     }
 

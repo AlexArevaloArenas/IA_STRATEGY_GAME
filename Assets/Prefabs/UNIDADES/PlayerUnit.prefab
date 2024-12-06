@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba05c0b7257fe6458ce725f8651cc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
   sprite: {fileID: 0}
   speed: 3
   turnSpeed: 3
@@ -196,10 +196,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 1
   type: 3
+  viewRange: 0
   MaxHealth: 5
+  currentHealth: 0
   AttackDamage: 5
-  AttackRange: 5
-  MoveRange: 5
+  AttackRange: 3
+  MoveRange: 3
   team: Player
   hpBar: {fileID: 0}
   picture: {fileID: 0}

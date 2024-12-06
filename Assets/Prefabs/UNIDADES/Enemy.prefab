@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3825959899877194368}
   - component: {fileID: 8700058154566253161}
   - component: {fileID: 365552655693503404}
+  - component: {fileID: 3364667174868928724}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -48,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba05c0b7257fe6458ce725f8651cc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
   sprite: {fileID: 0}
   speed: 3
   turnSpeed: 3
@@ -80,14 +81,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 1
   type: 3
+  viewRange: 0
   MaxHealth: 5
+  currentHealth: 0
   AttackDamage: 5
-  AttackRange: 5
-  MoveRange: 5
+  AttackRange: 3
+  MoveRange: 3
   team: Enemy
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 
+--- !u!114 &3364667174868928724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124668319580487662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 985add12ee4836e40b7241671b1d892c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fogWar: {fileID: 0}
+  visibility: 1
+  additionalRadius: 0
 --- !u!1 &246407456659251824
 GameObject:
   m_ObjectHideFlags: 0

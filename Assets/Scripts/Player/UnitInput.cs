@@ -66,6 +66,10 @@ public class UnitInput : MonoBehaviour
                         selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.transform.parent.GetComponent<Unit>());
                         
                     }
+                    else if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Player")
+                    {
+                        selections.unitSelected[0].GetComponent<Unit>().Revive();
+                    }
                     
                 }
             }

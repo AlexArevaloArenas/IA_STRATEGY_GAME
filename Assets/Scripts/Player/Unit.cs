@@ -11,6 +11,7 @@ public class Unit : MonoBehaviour
     public UnitType type;
     private Agent pathfindingAgent;
 
+    public float viewRange;
     public float MaxHealth;
     public float currentHealth;
     public float AttackDamage;
@@ -22,6 +23,7 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
+        viewRange = MoveRange;
     }
 
     //HEALTHBARS
@@ -42,7 +44,7 @@ public class Unit : MonoBehaviour
         //Vector3 direction = (enemy.transform.position - transform.position ).normalized;
         //LayerMask.NameToLayer("Unit"))
         //Physics.Raycast(transform.position, direction, AttackRange, LayerMask.NameToLayer("Unit"))
-        if (Vector3.Distance(transform.position,enemy.transform.position) < AttackRange)
+        if (Vector3.Distance(transform.position,enemy.transform.position) < AttackRange && currentHealth>0)
         {
             UnitType enemytype = enemy.GetComponent<Unit>().type;
             Debug.Log("Ataco!!");
@@ -135,8 +137,23 @@ public class Unit : MonoBehaviour
         Debug.Log("Me atacan!!");
         currentHealth -= damage;
         if (currentHealth < 0) {
-            Destroy(gameObject);
+            Die();
         }
+    }
+
+    public void Revive()
+    {
+        currentHealth = MaxHealth / 2;
+        if (team == "Player")
+        {
+            transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.green;
+        }
+        else
+        {
+            transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.magenta;
+        }
+        
+        GetComponent<Unit>().enabled = true;
     }
 
     public float GetHealth()
@@ -144,10 +161,12 @@ public class Unit : MonoBehaviour
         return currentHealth;
     }
 
-    public void OnDestroy()
+    private void Die()
     {
-        //Dead Animation and Particles
+        transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.grey;
+        GetComponent<Unit>().enabled = false;
     }
+
 }
 
 public enum UnitType

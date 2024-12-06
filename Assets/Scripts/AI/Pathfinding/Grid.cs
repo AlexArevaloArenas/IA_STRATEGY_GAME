@@ -86,7 +86,7 @@ public class Grid : MonoBehaviour {
                 if (Physics.CheckSphere(worldPoint, nodeRadius, elevatorMask))
                 {
                     elevator = true;
-                    Debug.Log(elevator);
+                    //Debug.Log(elevator);
 
                 }
 
