@@ -196,9 +196,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 1
   type: 3
-  viewRange: 0
+  viewRange: 3
   MaxHealth: 5
-  currentHealth: 0
+  currentHealth: 5
   AttackDamage: 5
   AttackRange: 3
   MoveRange: 3

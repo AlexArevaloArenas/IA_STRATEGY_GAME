@@ -205,7 +205,6 @@ public class Grid : MonoBehaviour {
 		return neighbours;
 	}
 
-
 	public GridNode NodeFromWorldPoint(Vector3 worldPosition) {
 		float percentX = (worldPosition.x + gridWorldSize.x/2) / gridWorldSize.x;
 		float percentY = (worldPosition.z + gridWorldSize.y/2) / gridWorldSize.y;

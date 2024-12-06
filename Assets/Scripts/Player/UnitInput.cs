@@ -66,8 +66,9 @@ public class UnitInput : MonoBehaviour
                         selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.transform.parent.GetComponent<Unit>());
                         
                     }
-                    else if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Player")
+                    else if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Player" && GameManager.Instance.PlayerBlood>0)
                     {
+                        GameManager.Instance.PlayerBlood = GameManager.Instance.PlayerBlood - 1;
                         selections.unitSelected[0].GetComponent<Unit>().Revive();
                     }
                     

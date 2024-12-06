@@ -181,6 +181,10 @@ public class Agent : MonoBehaviour
         StartCoroutine(UpdatePath());
     }
 
+    public bool IsPlaceAvailable(Vector3 punto, float range)
+    {
+        return PathRequestManager._IsPlaceAvailable(punto, range);
+    }
 
     public Unit[] EnemiesAvailable()
     {

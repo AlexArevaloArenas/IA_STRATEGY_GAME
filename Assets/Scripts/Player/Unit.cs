@@ -34,8 +34,11 @@ public class Unit : MonoBehaviour
 
     public void Move(Vector3 punto)
     {
-        pathfindingAgent.GoTo(punto);
-        GameManager.Instance.EndUnitAction();
+        if (pathfindingAgent.IsPlaceAvailable(punto,AttackRange))
+        {
+            pathfindingAgent.GoTo(punto);
+            GameManager.Instance.EndUnitAction();
+        }   
     }
 
     public void Attack(Unit enemy)
@@ -127,7 +130,7 @@ public class Unit : MonoBehaviour
                     break;
 
             }
-
+            GameManager.Instance.TeamCheck();
             GameManager.Instance.EndUnitAction();
         }
     }

@@ -6,6 +6,8 @@ using System.Threading;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.SocialPlatforms;
 using Unity.VisualScripting;
+using static UnityEngine.GraphicsBuffer;
+using UnityEngine.TestTools;
 
 public class PathRequestManager : MonoBehaviour {
 
@@ -102,10 +104,19 @@ public class PathRequestManager : MonoBehaviour {
         );
     }
 
-
-
+    public static bool _IsPlaceAvailable(Vector3 punto,float range)
+    {
+        bool[,] revisedNodes = new bool[instance.pathfinding.grid.gridSizeX, instance.pathfinding.grid.gridSizeY];
+        for (int i = 0; i < instance.pathfinding.grid.gridSizeX; i++)
+        {
+            for (int j = 0; j < instance.pathfinding.grid.gridSizeY; j++)
+            {
+                revisedNodes[i, j] = false;
+            }
+        }
+        return instance.pathfinding.IsPlaceAvailable(instance.pathfinding.grid.NodeFromWorldPoint(punto), range, punto, revisedNodes);
+    }
 }
-
 public struct PathResult {
 	public Vector3[] path;
 	public bool success;

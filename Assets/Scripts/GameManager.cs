@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    
+    public GameObject spawnerPlayer;
+    public GameObject spawnerEnemy;
+    public GameObject[] availableUnits;
+
     int state = 0;
     public List<Unit> playerTeam;
     public List<Unit> enemyTeam;
@@ -44,6 +47,7 @@ public class GameManager : MonoBehaviour {
 
     void Start() {
         Time.timeScale = 1;
+        
         try
         {
             fogWar = GameObject.Find("FogWar").GetComponent<csFogWar>();
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour {
                 "Please rename the gameobject that the module is attachted to as \"FogWar\", " +
                 "or change the implementation located in the csFogVisibilityAgent.cs script.");
         }
+        GeneraEquipos();
     }
 
     void Update() {
@@ -68,7 +73,7 @@ public class GameManager : MonoBehaviour {
 
 
     void startGame() {
-        GeneraEquipos();
+        
         /*
         if (creación de personajes completa){ 
         if (Random.Range(0,1) == 0) isPlayerTurn = true;
@@ -100,8 +105,7 @@ public class GameManager : MonoBehaviour {
             //que la Ia haga sus cosas de GOAP e historias, cuando haga el ataque con una unidad, hay que hacer que no pueda hacer nada con esa en este turno, y que se haga un unitsUsed++
             GoapAgent.TurnStart();
         }
-            
-        statCheck();
+           
     }
 
     void endGame() {
@@ -162,17 +166,26 @@ public class GameManager : MonoBehaviour {
             //enemyTeam[i].position = ;
         }
         */
+        for (int i = 0; i < 5; i++) {
+            GameObject unit1 = availableUnits[Random.Range(0, 4)];
+            GameObject punit = Instantiate(unit1, spawnerPlayer.transform.GetChild(i).transform.position, Quaternion.identity);
+            playerTeam.Add(punit.GetComponent<Unit>());
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject unit2 = availableUnits[Random.Range(4, 8)];
+            GameObject eunit = Instantiate(unit2, spawnerEnemy.transform.GetChild(i).transform.position, Quaternion.identity);
+            enemyTeam.Add(eunit.GetComponent<Unit>());
+        }
+        
         foreach (Unit u in playerTeam)
         {
+            Debug.Log("AAAAAAAAAAAAAAA");
             fogWar.AddFogExternal(u);
+            Debug.Log(":((((((((((((((");
         }
+        TeamCheck();
     }    
-    
-    void statCheck() {
-
-        
-        
-    }
 
     public void EndUnitAction()
     {
@@ -188,15 +201,15 @@ public class GameManager : MonoBehaviour {
     {
         visibleAlivePlayerTeam.Clear();
         visibleAliveEnemyTeam.Clear();
-
+        //&& u.visible
         foreach (Unit u in playerTeam) {
-            if (u.currentHealth>0 && u.visible)
+            if (u.currentHealth>0 )
             {
                 visibleAlivePlayerTeam.Add(u);
             } 
         }
         foreach (Unit u in enemyTeam) {
-            if (u.currentHealth > 0 && u.visible)
+            if (u.currentHealth > 0 )
             {
                 visibleAliveEnemyTeam.Add(u);
             }            

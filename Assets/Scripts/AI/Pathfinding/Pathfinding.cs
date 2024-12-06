@@ -265,7 +265,46 @@ private void FindSafePlaces(GridNode node, float moveRange, List<Unit> enemies, 
 		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, enemyUnits);
 	}
 
-	
+	public bool IsPlaceAvailable(GridNode currentNode,float moveRange,Vector3 target, bool[,] revisedNodeMatrix)
+	{
+        // Si el nodo actual es el mismo que el nodo objetivo, devolver true
+        if (currentNode == grid.NodeFromWorldPoint(target))
+        {
+            return true;
+        }
 
+        // Si el rango de movimiento se ha agotado, devolver false
+        if (moveRange <= 0)
+        {
+            return false;
+        }
 
+        // Obtener los vecinos del nodo actual
+        List<GridNode> neighbors = grid.GetNeighbours(currentNode);
+
+        if (neighbors.Count > 0)
+        {
+            foreach (GridNode nn in neighbors)
+            {
+                // Asegúrate de que el nodo no haya sido visitado previamente
+                if (revisedNodeMatrix[nn.gridX, nn.gridY]) continue;
+
+                // Marca el nodo como visitado
+                revisedNodeMatrix[nn.gridX, nn.gridY] = true;
+
+                // Calcula la distancia al vecino
+                float distance = Vector3.Distance(nn.worldPosition, currentNode.worldPosition);
+
+                // Llamada recursiva para comprobar si el objetivo es alcanzable desde este vecino
+                if (IsPlaceAvailable(nn, moveRange - distance, target, revisedNodeMatrix))
+                {
+                    return true;
+                }
+            }
+        }
+
+        // Si no hay vecinos disponibles o ninguno lleva al objetivo, devolver false
+        return false;
+
+    }
 }
