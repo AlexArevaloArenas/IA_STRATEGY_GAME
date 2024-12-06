@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour {
         } 
         else {
             //que la Ia haga sus cosas de GOAP e historias, cuando haga el ataque con una unidad, hay que hacer que no pueda hacer nada con esa en este turno, y que se haga un unitsUsed++
-            GoapAgent.SetupGOAP();
+            GoapAgent.TurnStart();
         }
             
         statCheck();
