@@ -12,7 +12,7 @@ public class Unit : MonoBehaviour
     private Agent pathfindingAgent;
 
     public float MaxHealth;
-    private float currentHealth;
+    public float currentHealth;
     public float AttackDamage;
     public float AttackRange;
     public float MoveRange;
