@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - FogWar
+  - Enemy
   layers:
   - Default
   - TransparentFX
