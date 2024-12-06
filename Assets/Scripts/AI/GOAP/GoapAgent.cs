@@ -77,6 +77,7 @@ public class GoapAgent : MonoBehaviour
 
 
         // Create the planner
+        gFactory = GetComponent<GoapFactory>();
         gPlanner = gFactory.CreatePlanner();
 
     }
