@@ -56,7 +56,7 @@ public class MoveToEnemyStrategy : IActionStrategy
 
         GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
             targetEnemy,
-            new List<Unit>(nearbyEnemies),
+            nearbyEnemies.ToList(),
             currentUnit.type
         );
 
@@ -69,9 +69,7 @@ public class MoveToEnemyStrategy : IActionStrategy
         else
         {
             // Second step: Find the best safe places considering all nearby enemies
-            GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
-                new List<Unit>(nearbyEnemies)
-            );
+            GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
 
             if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
             {
@@ -132,6 +130,46 @@ public class ExploreStrategy : IActionStrategy
 
 }
 
+public class ResurrectStrategy : IActionStrategy
+{
+
+    readonly Unit currentUnit;
+    readonly Unit deadAlly;
+    readonly GameObject prefab;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+
+
+    public ResurrectStrategy(Unit currentUnit, Unit deadAlly, GameObject prefab) //Se le pasa el prefab desed el goapAgent
+    {
+        this.currentUnit = currentUnit;
+        this.deadAlly = deadAlly;
+        this.prefab = prefab;
+    }
+
+
+
+    public void Start()
+    {
+        GameObject.Instantiate(currentUnit, deadAlly.transform.position, Quaternion.identity); //Se instancia la nueva unidad
+        GameManager.Instance.enemyTeam.Add(prefab.GetComponent<Unit>()); //Se agrega la nueva unidad a la lista de enemigos
+        complete = true;
+
+    }
+
+}
+/*
+// First step: Find nearby enemies
+Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+// Second step: Find the best safe places considering all nearby enemies
+GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+
+
+//currentUnit.GetComponent<Agent>().GoTo();
+*/
 
 
 
@@ -158,9 +196,7 @@ public class FleeFromEnemyStrategy : IActionStrategy
         //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
 
         // Second step: Find the best safe places considering all nearby enemies
-        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
-            new List<Unit>(nearbyEnemies)
-        );
+        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
 
         if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
         {

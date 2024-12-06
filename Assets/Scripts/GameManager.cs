@@ -6,14 +6,17 @@ public class GameManager : MonoBehaviour {
 
     
     int state = -1;
-    public Unit[] playerTeam;
-    public Unit[] enemyTeam;
+    public List<Unit> playerTeam;
+    public List<Unit> enemyTeam;
     public bool acabado = false;
     bool victory = false;
     public bool isPlayerTurn;
     [SerializeField] private int unitsPerTurn;
     public int unitsUsed;
     int teamSize;
+
+    public int PlayerBlood = 0;
+    public int AIBlood = 0;
 
     public GoapAgent GoapAgent { get; private set; }
 
@@ -60,13 +63,13 @@ public class GameManager : MonoBehaviour {
     }
 
     void runGame() {
-        if (playerTeam.Length == 0){
+        if (playerTeam.Count == 0){
             //Jugador Pierde
             Time.timeScale = 0;
             //Mostrar cosas del canvas
         }
         
-        else if (enemyTeam.Length == 0){
+        else if (enemyTeam.Count == 0){
             //Jugador Gana
             Time.timeScale = 0;
             //Mostrar cosas del canvas

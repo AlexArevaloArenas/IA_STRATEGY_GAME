@@ -41,7 +41,14 @@ public class GoapAgent : MonoBehaviour
     List<Unit> enemies;
 
     bool fleeEnemy;
+
+    //Mecanica resureccion
     bool canResurrect;
+    GameObject resurrectedUnit;
+    public GameObject knightPrefab;
+    public GameObject archerPrefab;
+    public GameObject magePrefab;
+    public GameObject pawnPrefab;
 
     GameObject target;
     Vector3 destination;
@@ -95,6 +102,8 @@ public class GoapAgent : MonoBehaviour
             enemyUnit = SelectMostDangerousUnit(allies, enemies);
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
         }
+
+        else resurrectedUnit = SelectResurrectType(allies, enemies);
 
         currentUnit = SelectCurrentUnit(enemyUnit, allies);
 
@@ -201,12 +210,13 @@ public class GoapAgent : MonoBehaviour
             //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
 
-        /* REVISAR
+        
         actions.Add(new AgentAction.Builder("CanResurrect")
-            .WithStrategy(new ResurrectStrategy(currentUnit, deadUnit))
+            .WithStrategy(new ResurrectStrategy(currentUnit, deadUnit, resurrectedUnit)) //Instancia el prefab de la unidad que elige la IA
             .AddPrecondition(beliefs["CanResurrect"])
             //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
+        /*
 
         actions.Add(new AgentAction.Builder("MoveToDeadAlly")
             .WithStrategy(new MoveToDeadAllyStrategy(currentUnit, deadUnit))
@@ -249,6 +259,8 @@ public class GoapAgent : MonoBehaviour
 
     bool CanResurrect(List<Unit> allies)
     {
+        if (GameManager.Instance.AIBlood == 0) return false;
+
         foreach(Unit a in allies)
         {
             if (a.currentHealth <= 0f) {
@@ -568,6 +580,112 @@ public class GoapAgent : MonoBehaviour
                                   .FirstOrDefault();
 
         return selectedUnit;
+    }
+
+    private GameObject SelectResurrectType(List<Unit> allies, List<Unit> enemies)
+    {
+
+        List<Unit> knightUnits = new List<Unit>();
+        List<Unit> archerUnits = new List<Unit>();
+        List<Unit> mageUnits = new List<Unit>();
+
+        List<Unit> auxiliarList = new List<Unit>();
+
+        if (enemies.Count > allies.Count)  //Jugador tiene mas unidades - Se selecciona counter de lo que mas tenga
+        { 
+            foreach(Unit u in enemies) //Las listas se rellenan con las unidades del jugador
+            {
+                switch (u.type)
+                {
+                    case UnitType.Archer:
+                        archerUnits.Add(u); break;
+                    case UnitType.Knight:
+                        knightUnits.Add(u); break;
+                    case UnitType.Mage:
+                        mageUnits.Add(u); break;
+
+                    default: //Se selecciona una unidad de tipo peon si no hay del resto
+                        return pawnPrefab;
+
+                }
+            }
+
+            auxiliarList = ObtainUnitList(knightUnits, archerUnits, mageUnits, true); //Se obtiene la lista mas larga (true) y se selecciona el counter
+            if (auxiliarList == knightUnits) return magePrefab;
+            if (auxiliarList == archerUnits) return knightPrefab;
+            if (auxiliarList == mageUnits) return archerPrefab;
+            return pawnPrefab;
+        }
+
+        else //Si es menor o igual, se hace al reves
+        {
+            foreach (Unit u in allies) //Las listas se rellenan con las unidades de la IA
+            {
+                switch (u.type)
+                {
+                    case UnitType.Archer:
+                        archerUnits.Add(u); break;
+                    case UnitType.Knight:
+                        knightUnits.Add(u); break;
+                    case UnitType.Mage:
+                        mageUnits.Add(u); break;
+
+                    default: //Se selecciona una unidad de tipo peon si no hay del resto
+                        return pawnPrefab;
+
+                }
+            }
+
+            auxiliarList = ObtainUnitList(knightUnits, archerUnits, mageUnits, false); //Se obtiene la lista mas corta (false)
+
+            //La unidad resucitada sera del tipo que menos tenga la IA
+            if (auxiliarList == knightUnits) return knightPrefab;
+            if (auxiliarList == archerUnits) return archerPrefab;
+            if (auxiliarList == mageUnits) return magePrefab;
+            return pawnPrefab;
+        }
+
+    }
+
+    List<Unit> ObtainUnitList(List<Unit> list1, List<Unit> list2, List<Unit> list3, bool larger)
+    {
+        // Compara las longitudes
+        int longitud1 = list1.Count;
+        int longitud2 = list2.Count;
+        int longitud3 = list3.Count;
+
+        if (larger) //Se busca obtener la lista mas larga
+        {
+            if (longitud1 >= longitud2 && longitud1 >= longitud3)
+            {
+                return list1;
+            }
+            else if (longitud2 >= longitud1 && longitud2 >= longitud3)
+            {
+                return list2;
+            }
+            else
+            {
+                return list3;
+            }
+        }
+
+        else //Se busca obtener la lista mas corta
+        {
+            if (longitud1 <= longitud2 && longitud1 <= longitud3)
+            {
+                return list1;
+            }
+            else if (longitud2 <= longitud1 && longitud2 <= longitud3)
+            {
+                return list2;
+            }
+            else
+            {
+                return list3;
+            }
+        }
+
     }
 
 
