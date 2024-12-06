@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
     public bool acabado = false;
     bool victory = false;
     public bool isPlayerTurn;
+    public bool isEnemyTurn;
     [SerializeField] private int unitsPerTurn;
     public int unitsUsed;
     int teamSize;
@@ -105,7 +106,12 @@ public class GameManager : MonoBehaviour {
         } 
         else {
             //que la Ia haga sus cosas de GOAP e historias, cuando haga el ataque con una unidad, hay que hacer que no pueda hacer nada con esa en este turno, y que se haga un unitsUsed++
-            GoapAgent.TurnStart();
+            if (isEnemyTurn == false)
+            {
+                GoapAgent.TurnStart();
+                isEnemyTurn = true;
+            }
+            
         }
            
     }
@@ -186,6 +192,14 @@ public class GameManager : MonoBehaviour {
             fogWar.AddFogExternal(u);
             //Debug.Log(":((((((((((((((");
         }
+
+        //QUITAR CUANDO NO QUERAMOS VER A LOS ENEMIGOS
+        foreach (Unit u in enemyTeam)
+        {
+            //Debug.Log("AAAAAAAAAAAAAAA");
+            fogWar.AddFogExternal(u);
+            //Debug.Log(":((((((((((((((");
+        }
         TeamCheck();
     }    
 
@@ -216,6 +230,12 @@ public class GameManager : MonoBehaviour {
                 visibleAliveEnemyTeam.Add(u);
             }            
         }
+    }
+
+    public void EndAITurn()
+    {
+        isPlayerTurn=true;
+        isEnemyTurn=false;
     }
 
 }
