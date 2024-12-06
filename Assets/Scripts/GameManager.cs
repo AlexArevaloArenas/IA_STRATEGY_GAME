@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
     public int PlayerBlood = 0;
     public int AIBlood = 0;
 
-    public GoapAgent GoapAgent { get; private set; }
+    public GoapAgent GoapAgent;
 
     public GameObject canvasPrefab;
     public csFogWar fogWar = null;
@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour {
         try
         {
             fogWar = GameObject.Find("FogWar").GetComponent<csFogWar>();
+            GoapAgent = GameObject.Find("GOAP").GetComponent<GoapAgent>();
+            //GoapAgent.enabled = true;
 
         }
         catch
@@ -180,9 +182,9 @@ public class GameManager : MonoBehaviour {
         
         foreach (Unit u in playerTeam)
         {
-            Debug.Log("AAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAA");
             fogWar.AddFogExternal(u);
-            Debug.Log(":((((((((((((((");
+            //Debug.Log(":((((((((((((((");
         }
         TeamCheck();
     }    

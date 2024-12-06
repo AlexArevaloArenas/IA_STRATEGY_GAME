@@ -608,7 +608,7 @@ namespace FischlWorks_FogWar
 
         public void AddFogExternal(Unit unit)
         {
-            Debug.Log("Añadir!!");
+            //Debug.Log("Añadir!!");
             //(int) unit.viewRange
             
             fogRevealers.Add(new FogRevealer(unit.transform, 3, false));

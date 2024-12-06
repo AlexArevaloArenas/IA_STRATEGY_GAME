@@ -130,6 +130,7 @@ public class Pathfinding : MonoBehaviour {
 
 	public void FindAvailableEnemies(GridNode node,float moveRange, float attackRange, ref List<Unit> attackableEnemies, bool[,] revisedNodeMatrix, Unit[] enemies)
     {
+		if (enemies == null || enemies.Length == 0) return; 
 
         if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
         {
@@ -151,7 +152,10 @@ public class Pathfinding : MonoBehaviour {
             {
 				// Realizamos búsqueda recursiva con una profundidad reducida
 				float distance = Vector3.Distance(nn.worldPosition,node.worldPosition);
-                FindAvailableEnemies(nn, moveRange, attackRange- distance, ref attackableEnemies, revisedNodeMatrix, enemies);
+                if (moveRange - distance > 0) // Add this check to prevent infinite recursion
+				{
+					FindAvailableEnemies(nn, moveRange - distance, attackRange, ref attackableEnemies, revisedNodeMatrix, enemies);
+				}
             }
 
         }

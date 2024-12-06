@@ -115,10 +115,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 648c55ca125f36340b444a94de39accf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnerPlayer: {fileID: 0}
+  spawnerEnemy: {fileID: 0}
+  availableUnits: []
   playerTeam: []
   enemyTeam: []
+  visibleAlivePlayerTeam: []
+  visibleAliveEnemyTeam: []
   acabado: 0
   isPlayerTurn: 1
   unitsPerTurn: 0
   unitsUsed: 0
+  PlayerBlood: 0
+  AIBlood: 0
   canvasPrefab: {fileID: 0}
+  fogWar: {fileID: 0}

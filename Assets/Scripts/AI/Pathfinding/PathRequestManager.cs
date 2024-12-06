@@ -45,10 +45,26 @@ public class PathRequestManager : MonoBehaviour {
 			results.Enqueue (result);
         }
     }
+
+    //Method to find all enemies
+    private static Unit[] FindAllEnemies() {
+    GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+    List<Unit> enemyUnits = new List<Unit>();
+
+    foreach (GameObject enemyObject in enemyObjects) {
+        Unit unit = enemyObject.GetComponent<Unit>();
+        if (unit != null) {
+            enemyUnits.Add(unit);
+        }
+    }
+
+    return enemyUnits.ToArray();
+}
+
     public static Unit[] FindEnemiesAvailable(Vector3 pos, float moveRange, float attackRange)
     {
 		List<Unit> attacktableEnemies = new List<Unit>();
-		Unit[] enemies = new Unit[1];
+		Unit[] enemies = FindAllEnemies();
 
         bool[,] revisedNodes = new bool[instance.pathfinding.grid.gridSizeX, instance.pathfinding.grid.gridSizeY];
         for (int i = 0; i < instance.pathfinding.grid.gridSizeX; i++)

@@ -8,11 +8,11 @@ using UnityEngine.AI;
 using Random = UnityEngine.Random;
 using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.Rendering.VolumeComponent;
+using UnityServiceLocator; // https://github.com/adammyhre/Unity-Service-Locator
 
-[RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(AnimationController))]
 public class GoapAgent : MonoBehaviour
 {
+    /*
     [Header("Sensors")]
     [SerializeField] Sensor chaseSensor;
     [SerializeField] Sensor attackSensor;
@@ -30,6 +30,7 @@ public class GoapAgent : MonoBehaviour
     [Header("Unit Data")]
     public float health = 100;
     public float stamina = 100;
+    */
 
     CountdownTimer statsTimer;
 
@@ -67,18 +68,24 @@ public class GoapAgent : MonoBehaviour
 
     void Awake()
     {
+        /*
         navMeshAgent = GetComponent<NavMeshAgent>();
         animations = GetComponent<AnimationController>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        */
 
+
+        // Create the planner
         gPlanner = gFactory.CreatePlanner();
+
     }
 
     void Start()
     {
         
         SetupGOAP();
+        
         
     }
  
@@ -94,18 +101,25 @@ public class GoapAgent : MonoBehaviour
     public void TurnStart()     //This function is called EVERY TURN AI PLAYS
     {
         ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
-        allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
-        enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
+        //allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
+        //enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
+        allies = GameManager.Instance.visibleAliveEnemyTeam;
+        enemies = GameManager.Instance.visibleAlivePlayerTeam;
         canResurrect = CanResurrect(allies);
         if (!canResurrect)
         {
             enemyUnit = SelectMostDangerousUnit(allies, enemies);
+            currentUnit = SelectCurrentUnit(enemyUnit, allies);
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
+            Debug.Log("Enemy unit: " + enemyUnit);
+            Debug.Log("Current unit: " + currentUnit);
+            Debug.Log("Flee enemy: " + fleeEnemy);
         }
 
-        else resurrectedUnit = SelectResurrectType(allies, enemies);
-
-        currentUnit = SelectCurrentUnit(enemyUnit, allies);
+        else {
+            resurrectedUnit = SelectResurrectType(allies, enemies);
+            currentUnit = SelectCurrentUnit(enemyUnit, allies);
+        } 
 
     }
 
@@ -257,7 +271,7 @@ public class GoapAgent : MonoBehaviour
 
         goals.Add(new AgentGoal.Builder("MoveToEnemyTarget") //Move to enemy: Priority 1
             .WithPriority(1)
-            .WithDesiredEffect(beliefs["MoveToEnemy"])
+            .WithDesiredEffect(beliefs["CanMoveToEnemy"])
             .Build());
 
         goals.Add(new AgentGoal.Builder("Explore") //Explore: Priority 0
@@ -279,10 +293,12 @@ public class GoapAgent : MonoBehaviour
     // TODO move to stats system
     void UpdateStats()
     {
+        /*
         stamina += InRangeOf(restingPosition.position, 3f) ? 20 : -10;
         health += InRangeOf(foodShack.position, 3f) ? 20 : -5;
         stamina = Mathf.Clamp(stamina, 0, 100);
         health = Mathf.Clamp(health, 0, 100);
+        */
     }
 
     bool CanResurrect(List<Unit> allies)
@@ -303,8 +319,15 @@ public class GoapAgent : MonoBehaviour
 
     bool FleeFromEnemy(Unit currentUnit, Unit targetEnemy)
     {
+        if (targetEnemy == null) return false;
+        if (currentUnit == null) return false;
+
+        //Debug.Log("Current unit is ", currentUnit);
         Unit counterEnemy = null;
         Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+        if(nearbyEnemies == null) return false;
+
+        Debug.Log(nearbyEnemies);
 
         GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
             targetEnemy,
@@ -525,6 +548,7 @@ public class GoapAgent : MonoBehaviour
     {
         if (enemies == null || enemies.Count == 0) //Para la estrategia de EXPLORAR
         {
+            Debug.Log("LISTA JUGADOR VISIBLES ES 0");
             int i = Random.Range(0, enemies.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
             return enemies[i];
         }
@@ -550,7 +574,7 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
     {
-        if (GameManager.Instance.playerTeam.Count == 0) //IMPORTANTE: SUSTITUIR POR VISIBLES
+        if (enemies.Count == 0) //Vista visible del jugador (lo que ve la IA)
         {
             int i = Random.Range(0, allies.Count); //Unidad random para jugar 
             return allies[i];
