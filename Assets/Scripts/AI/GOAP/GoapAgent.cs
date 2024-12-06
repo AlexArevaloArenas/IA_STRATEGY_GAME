@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DependencyInjection; // https://github.com/adammyhre/Unity-Dependency-Injection-Lite
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
+using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.Rendering.VolumeComponent;
 
 [RequireComponent(typeof(NavMeshAgent))]
@@ -32,9 +35,13 @@ public class GoapAgent : MonoBehaviour
 
     Unit currentUnit;
     Unit enemyUnit;
+    Unit deadUnit;
 
     List<Unit> allies;
     List<Unit> enemies;
+
+    bool fleeEnemy;
+    bool canResurrect;
 
     GameObject target;
     Vector3 destination;
@@ -82,8 +89,15 @@ public class GoapAgent : MonoBehaviour
         ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
         allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
         enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
-        enemyUnit = SelectMostDangerousUnit(allies, enemies);
+        canResurrect = CanResurrect(allies);
+        if (!canResurrect)
+        {
+            enemyUnit = SelectMostDangerousUnit(allies, enemies);
+            fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
+        }
+
         currentUnit = SelectCurrentUnit(enemyUnit, allies);
+
     }
 
     void SetupBeliefs()
@@ -112,38 +126,96 @@ public class GoapAgent : MonoBehaviour
         */
 
         // New beliefs
-        factory.AddBelief("CanMoveToAttackPosition", () => currentUnit.GetComponent<Agent>().HasPath());
-        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && Vector3.Distance(currentUnit.transform.position, enemyUnit.transform.position) <= currentUnit.AttackRange);
+
+        factory.AddBelief("Nothing", () => false);
+
+        factory.AddBelief("Explore", () => enemyUnit == null);
+
+        //No llega el raycast de ataque al enemigo
+        factory.AddBelief("CanMoveToEnemy", () => enemyUnit != null && 
+        !Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, 
+            currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
+
+        //Llega el raycast de ataque al enemigo
+        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null &&
+        Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized,
+            currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
+
+        //Flee belief
+        factory.AddBelief("FleeFromEnemy", () => fleeEnemy);
+
+        //Resurrection beliefs
+        factory.AddBelief("CanResurrect", () => canResurrect &&
+        Physics.Raycast(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized,
+            currentUnit.AttackRange, LayerMask.NameToLayer("Unit"))
+        );
+        factory.AddBelief("MoveToDeadAlly", () => canResurrect &&
+        !Physics.Raycast(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized,
+            currentUnit.AttackRange, LayerMask.NameToLayer("Unit"))
+        );
+
+
+
+
+        //factory.AddBelief("CanMoveToAttackPosition", () => currentUnit.GetComponent<Agent>().HasPath());
+
     }
 
     void SetupActions()
     {
         actions = new HashSet<AgentAction>();
 
+
+        /*
         actions.Add(new AgentAction.Builder("Relax")
             .WithStrategy(new IdleStrategy(5))
             .AddEffect(beliefs["Nothing"])
             .Build());
+        */
 
-            
+        /* REVISAR
+        actions.Add(new AgentAction.Builder("Explore")
+            .WithStrategy(new ExploreStrategy(currentUnit))
+            .AddPrecondition(beliefs["Explore"])
+            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .Build());
+        */
 
-        actions.Add(new AgentAction.Builder("MoveToAttackPosition")
-            .WithStrategy(new MoveToAttackPositionStrategy(currentUnit, enemyUnit))
-            .AddPrecondition(beliefs["PlayerInChaseRange"])
-            //.AddEffect(beliefs["PlayerInAttackRange"])
-            .AddEffect(beliefs["CanMoveToAttackPosition"])
+        actions.Add(new AgentAction.Builder("MoveToEnemy")
+            .WithStrategy(new MoveToEnemyStrategy(currentUnit, enemyUnit))
+            .AddPrecondition(beliefs["CanMoveToEnemy"])
+            //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
 
         actions.Add(new AgentAction.Builder("AttackPlayer")
             .WithStrategy(new AttackStrategy(currentUnit, enemyUnit))
-            //.AddPrecondition(beliefs["PlayerInAttackRange"])
-            .AddPrecondition(beliefs["CanMoveToAttackPosition"])
+            .AddPrecondition(beliefs["CanAttackEnemy"])
+            //.AddPrecondition(beliefs["CanMoveToAttackPosition"])
             //.AddEffect(beliefs["AttackingPlayer"])
-            .AddEffect(beliefs["CanAttackEnemy"])
+            //.AddEffect(beliefs["CanAttackEnemy"])
             .Build());
-            
 
-        
+        actions.Add(new AgentAction.Builder("FleeFromEnemy")
+            .WithStrategy(new FleeFromEnemyStrategy(currentUnit, enemyUnit))
+            .AddPrecondition(beliefs["FleeFromEnemy"])
+            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .Build());
+
+        /* REVISAR
+        actions.Add(new AgentAction.Builder("CanResurrect")
+            .WithStrategy(new ResurrectStrategy(currentUnit, deadUnit))
+            .AddPrecondition(beliefs["CanResurrect"])
+            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .Build());
+
+        actions.Add(new AgentAction.Builder("MoveToDeadAlly")
+            .WithStrategy(new MoveToDeadAllyStrategy(currentUnit, deadUnit))
+            .AddPrecondition(beliefs["MoveToDeadAlly"])
+            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .Build());
+        */
+
+
     }
 
     void SetupGoals()
@@ -173,6 +245,88 @@ public class GoapAgent : MonoBehaviour
         health += InRangeOf(foodShack.position, 3f) ? 20 : -5;
         stamina = Mathf.Clamp(stamina, 0, 100);
         health = Mathf.Clamp(health, 0, 100);
+    }
+
+    bool CanResurrect(List<Unit> allies)
+    {
+        foreach(Unit a in allies)
+        {
+            if (a.currentHealth <= 0f) {
+
+                deadUnit = a;
+                return true;
+
+            } 
+        }
+        return false;
+    }
+
+    bool FleeFromEnemy(Unit currentUnit, Unit targetEnemy)
+    {
+        Unit counterEnemy = null;
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
+            targetEnemy,
+            new List<Unit>(nearbyEnemies),
+            currentUnit.type
+        );
+
+        switch (currentUnit.type)
+        {
+            case UnitType.Knight:
+
+                foreach (Unit u in nearbyEnemies)
+                {
+                    if (u.type == UnitType.Mage)
+                    {
+                        counterEnemy = u; break;
+                    }
+                }
+                break;
+
+            case UnitType.Mage:
+
+                foreach (Unit u in nearbyEnemies)
+                {
+                    if (u.type == UnitType.Archer)
+                    {
+                        counterEnemy = u; break;
+                    }
+                }
+                break;
+
+            case UnitType.Archer:
+
+                foreach (Unit u in nearbyEnemies)
+                {
+                    if (u.type == UnitType.Knight)
+                    {
+                        counterEnemy = u; break;
+                    }
+                }
+                break;
+
+            default: break;
+
+        }
+
+        if (counterEnemy != null)
+        {
+            foreach (GridNode gn in bestAttackPlaces)
+            {
+                if (Physics.Raycast(counterEnemy.transform.position,
+                    (gn.worldPosition - counterEnemy.transform.position).normalized, counterEnemy.AttackRange,
+                    LayerMask.NameToLayer("Unit")))
+                {
+                    return true;
+
+
+                }
+            }
+        }
+
+        return false;
     }
 
     bool InRangeOf(Vector3 pos, float range) => Vector3.Distance(currentUnit.transform.position, pos) < range;
@@ -327,7 +481,7 @@ public class GoapAgent : MonoBehaviour
         }
     }
 
-    private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies)
+    private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
     {
         if (enemies == null || enemies.Count == 0)
         {
@@ -355,6 +509,12 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
     {
+        if (currentEnemy == null)
+        {
+            int i = Random.Range(0, allies.Count);
+            return allies[i];
+        }
+
 
         List<Unit> strongestUnits = new List<Unit>();
         Unit selectedUnit = null;

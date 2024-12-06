@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using System.Linq;
 
 // TODO Migrate Strategies, Beliefs, Actions and Goals to Scriptable Objects and create Node Editor for them
+
 public interface IActionStrategy
 {
     bool CanPerform { get; }
@@ -29,6 +31,7 @@ public interface IActionStrategy
 
 public class MoveToEnemyStrategy : IActionStrategy
 {
+
     readonly Unit currentUnit;
     readonly Unit targetEnemy;
     bool complete;
@@ -49,40 +52,88 @@ public class MoveToEnemyStrategy : IActionStrategy
 
         //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
 
-        // Second step: Find the best safe places considering all nearby enemies
-        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
-            new List<Unit>(nearbyEnemies)
+
+
+        GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
+            targetEnemy,
+            new List<Unit>(nearbyEnemies),
+            currentUnit.type
         );
 
-        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        if(bestAttackPlaces.Length > 0)
         {
-            float minDistance = Mathf.Infinity;
-            int count = 0;
-
-            for(int i = 0; i < bestSafePlaces.Length; i++)
-            {
-                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
-                if(distance < minDistance)
-                {
-                    minDistance = distance;
-                    count = i;
-
-                }
-            }
-
-            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
-
+            currentUnit.GetComponent<Agent>().GoTo(bestAttackPlaces[0].worldPosition); 
+            complete = true; //Hay que esperar antes de pasar de turno
         }
+
         else
         {
-            complete = true;
+            // Second step: Find the best safe places considering all nearby enemies
+            GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(
+                new List<Unit>(nearbyEnemies)
+            );
+
+            if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+            {
+                float minDistance = Mathf.Infinity;
+                int count = 0;
+
+                for (int i = 0; i < bestSafePlaces.Length; i++)
+                {
+                    float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        count = i;
+
+                    }
+                }
+
+                currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+            }
+            else
+            {
+                complete = true;
+            }
+
         }
+
+        
     }
 
 
 }
 
 //FLEE FROM ENEMY DIRECTION
+
+public class ExploreStrategy : IActionStrategy
+{
+
+    readonly Unit currentUnit;
+    readonly Unit targetEnemy;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+    public ExploreStrategy(Unit currentUnit, Unit targetEnemy)
+    {
+        this.currentUnit = currentUnit;
+        this.targetEnemy = targetEnemy;
+    }
+
+    public void Start()
+    {
+         //currentUnit.GetComponent<Agent>().GoTo();
+         complete = true;
+
+    }
+
+}
+
+
+
 
 public class FleeFromEnemyStrategy : IActionStrategy
 {
@@ -139,6 +190,7 @@ public class FleeFromEnemyStrategy : IActionStrategy
 
 }
 
+/*
 public class MoveToAttackPositionStrategy : IActionStrategy
 {
     readonly Unit currentUnit;
@@ -158,6 +210,7 @@ public class MoveToAttackPositionStrategy : IActionStrategy
     {
         // First step: Find nearby enemies
         Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+        Unit counterEnemy = null;
 
         //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
 
@@ -191,6 +244,7 @@ public class MoveToAttackPositionStrategy : IActionStrategy
         complete = true;
     }
 }
+*/
 
 //ATTACK ENEMY TARGET
 public class AttackStrategy : IActionStrategy
