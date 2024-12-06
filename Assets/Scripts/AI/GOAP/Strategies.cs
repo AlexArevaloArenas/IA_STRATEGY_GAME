@@ -90,10 +90,7 @@ public class MoveToEnemyStrategy : IActionStrategy
                 currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
 
             }
-            else
-            {
-                complete = true;
-            }
+            complete = true;
 
         }
 
@@ -103,7 +100,7 @@ public class MoveToEnemyStrategy : IActionStrategy
 
 }
 
-//FLEE FROM ENEMY DIRECTION
+//EXPLORE TO RANDOM ENEMY (CANT ATTACK)
 
 public class ExploreStrategy : IActionStrategy
 {
@@ -123,13 +120,38 @@ public class ExploreStrategy : IActionStrategy
 
     public void Start()
     {
-         //currentUnit.GetComponent<Agent>().GoTo();
-         complete = true;
+        // First step: Find nearby enemies
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        // Second step: Find the best safe places considering all nearby enemies
+        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+
+        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        {
+            float minDistance = Mathf.Infinity;
+            int count = 0;
+
+            for (int i = 0; i < bestSafePlaces.Length; i++)
+            {
+                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    count = i;
+
+                }
+            }
+
+            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+        }
+        complete = true;
 
     }
 
 }
 
+//RESURRECT STRATEGY
 public class ResurrectStrategy : IActionStrategy
 {
 
@@ -161,18 +183,60 @@ public class ResurrectStrategy : IActionStrategy
     }
 
 }
-/*
-// First step: Find nearby enemies
-Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
-// Second step: Find the best safe places considering all nearby enemies
-GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+
+//MOVE TO DEAD ALLY IN ORDER TO RESURRECT LATER
+public class MoveToDeadAllyStrategy : IActionStrategy
+{
+    readonly Unit currentUnit;
+    readonly Unit deadAlly;
+    bool complete;
+
+    public bool CanPerform => !complete;
+    public bool Complete => complete;
+
+    public MoveToDeadAllyStrategy(Unit currentUnit, Unit deadAlly)
+    {
+        this.currentUnit = currentUnit;
+        this.deadAlly = deadAlly;
+    }
+
+    public void Start()
+    {
+        // First step: Find nearby enemies
+        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+
+        //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
+
+        // Second step: Find the best safe places considering all nearby enemies
+        GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+
+        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        {
+            float maxDistance = 0f;
+            int count = 0;
+
+            for (int i = 0; i < bestSafePlaces.Length; i++)
+            {
+                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, deadAlly.transform.position);
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    count = i;
+
+                }
+            }
+
+            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+        }
+        complete = true;
+    }
 
 
-//currentUnit.GetComponent<Agent>().GoTo();
-*/
+}
 
 
-
+//FLEE FROM ENEMY DIRECTION
 public class FleeFromEnemyStrategy : IActionStrategy
 {
     readonly Unit currentUnit;
@@ -217,70 +281,11 @@ public class FleeFromEnemyStrategy : IActionStrategy
             currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
 
         }
-        else
-        {
-            complete = true;
-        }
-    }
-
-
-}
-
-/*
-public class MoveToAttackPositionStrategy : IActionStrategy
-{
-    readonly Unit currentUnit;
-    readonly Unit targetEnemy;
-    bool complete;
-
-    public bool CanPerform => !complete;
-    public bool Complete => complete;
-
-    public MoveToAttackPositionStrategy(Unit currentUnit, Unit targetEnemy)
-    {
-        this.currentUnit = currentUnit;
-        this.targetEnemy = targetEnemy;
-    }
-
-    public void Start()
-    {
-        // First step: Find nearby enemies
-        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
-        Unit counterEnemy = null;
-
-        //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
-
-        // Second step: Find the best attack places considering all nearby enemies
-        GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
-            targetEnemy,
-            new List<Unit>(nearbyEnemies),
-            currentUnit.type
-        );
-
-        if (bestAttackPlaces.Length > 0) //moves to the best attack place
-        {
-            currentUnit.GetComponent<Agent>().GoTo(bestAttackPlaces[0].worldPosition);
-        }
-        else
-        {
-            complete = true;
-        }
-    }
-
-    public void Update(float deltaTime)
-    {
-        if (currentUnit.GetComponent<Agent>().HasReachedDestination())
-        {
-            complete = true;
-        }
-    }
-
-    public void Stop()
-    {
         complete = true;
     }
+
+
 }
-*/
 
 //ATTACK ENEMY TARGET
 public class AttackStrategy : IActionStrategy
@@ -311,8 +316,7 @@ public class AttackStrategy : IActionStrategy
 }
 
 
-
-
+/*
 public class MoveStrategy : IActionStrategy
 {
     readonly NavMeshAgent agent;
@@ -378,3 +382,4 @@ public class IdleStrategy : IActionStrategy
     public void Start() => timer.Start();
     public void Update(float deltaTime) => timer.Tick(deltaTime);
 }
+*/

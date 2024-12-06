@@ -495,9 +495,10 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
     {
-        if (enemies == null || enemies.Count == 0)
+        if (enemies == null || enemies.Count == 0) //Para la estrategia de EXPLORAR
         {
-            return null;
+            int i = Random.Range(0, enemies.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
+            return enemies[i];
         }
 
         bool isAggressive = allies.Count < enemies.Count; // If we have less allies than enemies, AI plays agressive
@@ -521,9 +522,9 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
     {
-        if (currentEnemy == null)
+        if (GameManager.Instance.playerTeam.Count == 0) //IMPORTANTE: SUSTITUIR POR VISIBLES
         {
-            int i = Random.Range(0, allies.Count);
+            int i = Random.Range(0, allies.Count); //Unidad random para jugar 
             return allies[i];
         }
 
