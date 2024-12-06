@@ -182,13 +182,13 @@ public class GoapAgent : MonoBehaviour
             .Build());
         */
 
-        /* REVISAR
+        
         actions.Add(new AgentAction.Builder("Explore")
-            .WithStrategy(new ExploreStrategy(currentUnit))
+            .WithStrategy(new ExploreStrategy(currentUnit, enemyUnit))
             .AddPrecondition(beliefs["Explore"])
             //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
-        */
+        
 
         actions.Add(new AgentAction.Builder("MoveToEnemy")
             .WithStrategy(new MoveToEnemyStrategy(currentUnit, enemyUnit))
@@ -216,14 +216,14 @@ public class GoapAgent : MonoBehaviour
             .AddPrecondition(beliefs["CanResurrect"])
             //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
-        /*
+        
 
         actions.Add(new AgentAction.Builder("MoveToDeadAlly")
             .WithStrategy(new MoveToDeadAllyStrategy(currentUnit, deadUnit))
             .AddPrecondition(beliefs["MoveToDeadAlly"])
             //.AddEffect(beliefs["CanMoveToEnemy"])
             .Build());
-        */
+        
 
 
     }
@@ -232,9 +232,37 @@ public class GoapAgent : MonoBehaviour
     {
         goals = new HashSet<AgentGoal>();
 
-        goals.Add(new AgentGoal.Builder("AttackEnemyTarget")
+        goals.Add(new AgentGoal.Builder("FleeFromEnemyTarget") //Flee: Priority 4
+           .WithPriority(4)
+           .WithDesiredEffect(beliefs["FleeFromEnemy"])
+           .Build());
+
+        goals.Add(new AgentGoal.Builder("MoveToDeadAlly") //Resurrect: Priority 3
             .WithPriority(3)
+            .WithDesiredEffect(beliefs["MoveToDeadAlly"])
+            .Build());
+
+
+        goals.Add(new AgentGoal.Builder("CanResurrect")
+            .WithPriority(3)
+            .WithDesiredEffect(beliefs["CanResurrect"])
+            .Build());
+
+
+        goals.Add(new AgentGoal.Builder("AttackEnemyTarget") //Attack: Priority 2
+            .WithPriority(2)
             .WithDesiredEffect(beliefs["CanAttackEnemy"])
+            .Build());
+
+
+        goals.Add(new AgentGoal.Builder("MoveToEnemyTarget") //Move to enemy: Priority 1
+            .WithPriority(1)
+            .WithDesiredEffect(beliefs["MoveToEnemy"])
+            .Build());
+
+        goals.Add(new AgentGoal.Builder("Explore") //Explore: Priority 0
+            .WithPriority(0)
+            .WithDesiredEffect(beliefs["Explore"])
             .Build());
     }
 

@@ -178,6 +178,7 @@ public class ResurrectStrategy : IActionStrategy
     {
         GameObject.Instantiate(currentUnit, deadAlly.transform.position, Quaternion.identity); //Se instancia la nueva unidad
         GameManager.Instance.enemyTeam.Add(prefab.GetComponent<Unit>()); //Se agrega la nueva unidad a la lista de enemigos
+        GameManager.Instance.AIBlood -= 1;
         complete = true;
 
     }
