@@ -6,12 +6,15 @@ using System;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEditor.Experimental.GraphView;
 using static UnityEditor.PlayerSettings;
+using Unity.VisualScripting;
 
 public class Pathfinding : MonoBehaviour {
 
 	public Grid grid;
 	public LayerMask enemyUnits;
 	public LayerMask playerUnits;
+
+	public GameObject debugBola;
 
 	
 	void Awake() {
@@ -137,13 +140,19 @@ public class Pathfinding : MonoBehaviour {
             revisedNodeMatrix[node.gridX, node.gridY] = true;
 
 			foreach (Unit u in enemies) {
-                UnityEngine.Debug.DrawRay(node.worldPosition, (u.transform.position - node.worldPosition).normalized, Color.green, 2, false);
-                if (Physics.Raycast(node.worldPosition, (u.transform.position - node.worldPosition).normalized, attackRange, enemyUnits))
+                //UnityEngine.Debug.DrawRay(node.worldPosition, (u.transform.position - node.worldPosition).normalized * attackRange, Color.red, 2, false);
+				RaycastHit hit;
+                if (Physics.Raycast(node.worldPosition, (u.transform.position - node.worldPosition).normalized, out hit, attackRange, playerUnits))
 				{
-                    if (!attackableEnemies.Contains(u))
-                    {
-                        attackableEnemies.Add(u);
+					UnityEngine.Debug.Log("HIT NAME: " + hit.collider.gameObject.name);
+					if (hit.collider.transform.parent.CompareTag("Player"))
+					{
+                        if (!attackableEnemies.Contains(u))
+                        {
+                            attackableEnemies.Add(u);
+                        }
                     }
+                    
                 }
             }
 
@@ -165,45 +174,59 @@ public class Pathfinding : MonoBehaviour {
 
     }
 
-	public GridNode[] GetSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix)
-{
-    List<GridNode> safePlaces = new List<GridNode>();
-    float minDamage = Mathf.Infinity; 
+	
+    public GridNode[] GetSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix)
+	{
+		List<GridNode> safePlaces = new List<GridNode>();
+		float minDamage = Mathf.Infinity; 
 
-    FindSafePlaces(node, moveRange, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
+		FindSafePlaces(node, moveRange, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
 
-    return safePlaces.ToArray();
-}
+		if(enemies.Count == 0)
+		{
+            foreach (GridNode n in safePlaces)
+            {
 
-private void FindSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix, ref List<GridNode> safePlaces, ref float minDamage)
-{
-    if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
-    {
-        revisedNodeMatrix[node.gridX, node.gridY] = true;
-
-        float damage = CalculatePotentialDamage(node, enemies);
-
-        if (damage < minDamage) // New minimum damage
-        {
-            minDamage = damage;
-            safePlaces.Clear();
-            safePlaces.Add(node);
-        }
-        else if (damage == minDamage) // Same damage as minimum
-        {
-            safePlaces.Add(node);
+				Instantiate(debugBola, n.worldPosition, Quaternion.identity);
+            }
         }
 
-        List<GridNode> neighbors = grid.GetNeighbours(node);
-        neighbors.Sort((a, b) => b.worldPosition.y.CompareTo(a.worldPosition.y)); // Prioritize higher Y nodes
+		return safePlaces.ToArray();
+	}
 
-        foreach (GridNode nn in neighbors)
-        {
-            float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
-            FindSafePlaces(nn, moveRange - distance, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
-        }
-    }
-}
+	private void FindSafePlaces(GridNode node, float moveRange, List<Unit> enemies, bool[,] revisedNodeMatrix, ref List<GridNode> safePlaces, ref float minDamage)
+	{
+		if (!revisedNodeMatrix[node.gridX, node.gridY] && moveRange > 0)
+		{
+			revisedNodeMatrix[node.gridX, node.gridY] = true;
+
+			float damage = CalculatePotentialDamage(node, enemies);
+
+			if (damage < minDamage) // New minimum damage
+			{
+				minDamage = damage;
+				safePlaces.Clear();
+				safePlaces.Add(node);
+			}
+			else if (damage == minDamage) // Same damage as minimum
+			{
+				safePlaces.Add(node);
+			}
+
+			List<GridNode> neighbors = grid.GetNeighbours(node);
+			neighbors.Sort((a, b) => b.worldPosition.y.CompareTo(a.worldPosition.y)); // Prioritize higher Y nodes
+
+			foreach (GridNode nn in neighbors)
+			{
+				if (nn.walkable)
+				{
+                    float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
+                    FindSafePlaces(nn, moveRange - distance, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
+                }
+				
+			}
+		}
+	}
 
 	private float CalculatePotentialDamage(GridNode node, List<Unit> enemies) //raycast from enemy to player
 	{
@@ -270,6 +293,11 @@ private void FindSafePlaces(GridNode node, float moveRange, List<Unit> enemies, 
 	{
 		Vector3 direction = (targetUnit.transform.position - node.worldPosition).normalized;
 		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, enemyUnits);
+	}
+
+	private float GetDistanceBetweenNodes(GridNode n1, GridNode n2)
+	{
+		
 	}
 
 	public bool IsPlaceAvailable(GridNode currentNode,float moveRange,Vector3 target, bool[,] revisedNodeMatrix)

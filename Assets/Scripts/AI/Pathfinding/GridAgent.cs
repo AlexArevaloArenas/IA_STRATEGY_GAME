@@ -202,7 +202,7 @@ public class Agent : MonoBehaviour
 
     public GridNode[] FindSafePlaces(List<Unit> enemies)
     {
-        return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies);
+        return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies); 
     }
 
     private bool DoesVectorPointToTheRight(Vector3 vector)
