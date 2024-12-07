@@ -655,6 +655,75 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+--- !u!1 &567933017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 567933019}
+  - component: {fileID: 567933018}
+  m_Layer: 0
+  m_Name: FogWar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &567933018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567933017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5de54c084f472845b61ee9a97cb8a48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fogRevealers: []
+  levelMidPoint: {fileID: 0}
+  FogRefreshRate: 10
+  fogPlaneHeight: 1
+  fogPlaneMaterial: {fileID: 2100000, guid: 36b93ac6fcf129c449491654e397fe4a, type: 2}
+  fogColor: {r: 0.019607844, g: 0.05882353, b: 0.09803922, a: 1}
+  fogPlaneAlpha: 1
+  fogLerpSpeed: 2
+  fogPlaneTextureLerpTarget: {fileID: 0}
+  fogPlaneTextureLerpBuffer: {fileID: 0}
+  LevelDataToLoad: {fileID: 0}
+  saveDataOnScan: 1
+  levelNameToSave: Default
+  levelDimensionX: 40
+  levelDimensionY: 40
+  unitScale: 1
+  scanSpacingPerUnit: 0.25
+  rayStartHeight: 5
+  rayMaxDistance: 8
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  ignoreTriggers: 1
+  drawGizmos: 1
+  LogOutOfRange: 1
+--- !u!4 &567933019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567933017}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &640196046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,10 +1165,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 0
   type: 0
+  viewRange: 0
   MaxHealth: 0
+  currentHealth: 0
   AttackDamage: 0
   AttackRange: 0
   MoveRange: 0
+  team: 
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 
@@ -1127,7 +1199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba05c0b7257fe6458ce725f8651cc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 716414894}
+  target: {x: 0, y: 0, z: 0}
   sprite: {fileID: 1483034249}
   speed: 3
   turnSpeed: 3
@@ -1665,11 +1737,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 648c55ca125f36340b444a94de39accf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTeam: []
+  enemyTeam: []
+  visibleAlivePlayerTeam: []
+  visibleAliveEnemyTeam: []
   acabado: 0
   isPlayerTurn: 0
   unitsPerTurn: 3
   unitsUsed: 0
+  PlayerBlood: 0
+  AIBlood: 0
   canvasPrefab: {fileID: 0}
+  fogWar: {fileID: 0}
 --- !u!4 &1835877092
 Transform:
   m_ObjectHideFlags: 0
@@ -2076,6 +2155,9 @@ MonoBehaviour:
   terrain:
     serializedVersion: 2
     m_Bits: 512
+  unit:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &2068352167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2157,3 +2239,4 @@ SceneRoots:
   - {fileID: 1835877092}
   - {fileID: 349467590}
   - {fileID: 1073490404}
+  - {fileID: 567933019}

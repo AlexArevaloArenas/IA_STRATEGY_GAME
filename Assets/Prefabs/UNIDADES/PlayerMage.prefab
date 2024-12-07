@@ -8,6 +8,27 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2451436356415217826, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8405b07e25df91c45992470ad6fbf1fb,
+        type: 3}
+    - target: {fileID: 3237515682170781671, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.060102
+      objectReference: {fileID: 0}
+    - target: {fileID: 3237515682170781671, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5.060102
+      objectReference: {fileID: 0}
+    - target: {fileID: 3237515682170781671, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5.060102
+      objectReference: {fileID: 0}
     - target: {fileID: 3478578042663548379, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -63,9 +84,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerMage
       objectReference: {fileID: 0}
+    - target: {fileID: 6324577094311860963, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8405b07e25df91c45992470ad6fbf1fb,
+        type: 3}
+    - target: {fileID: 6955882903822078804, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 3116551266250116155}
+    - target: {fileID: 7725261492540344606, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.994647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7725261492540344606, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4.994647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7725261492540344606, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4.994647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 5041846962432395350, guid: 84a51abe40b10e1458cc3c4ff54c90d0, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 84a51abe40b10e1458cc3c4ff54c90d0, type: 3}
+--- !u!1 &3116551266250116155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8218785228165313550, guid: 84a51abe40b10e1458cc3c4ff54c90d0,
+    type: 3}
+  m_PrefabInstance: {fileID: 6435304410328643637}
+  m_PrefabAsset: {fileID: 0}
