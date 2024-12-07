@@ -19,6 +19,8 @@ public class Agent : MonoBehaviour
 
     GridPath path;
 
+    GridPath distancePath;
+
     void Start()
     {
         target = transform.position;
@@ -33,6 +35,15 @@ public class Agent : MonoBehaviour
 
             StopCoroutine("FollowPath");
             StartCoroutine("FollowPath");
+        }
+    }
+
+    //LO USAMOS PARA CALCULAR DISTANCIAS SIN RECORRER LA RUTA
+    public void DistanceOnPathFound(Vector3[] waypoints, bool pathSuccessful)
+    {
+        if (pathSuccessful)
+        {
+            distancePath = new GridPath(waypoints, transform.position, turnDst, stoppingDst);
         }
     }
 
@@ -203,6 +214,16 @@ public class Agent : MonoBehaviour
     public GridNode[] FindSafePlaces(List<Unit> enemies)
     {
         return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies); 
+    }
+
+    public float DistanceBetweenTwoNodes()   //DISTANCIA ENTRE DOS NODOS REAL, USANDO RUTAS
+    {
+        PathRequestManager.RequestPath(new PathRequest(transform.position, target, DistanceOnPathFound));
+        float distance = 0f;
+        for (int i = 0; i < distancePath.lookPoints.Length-1; i++) {
+            distance = distance + Vector3.Distance(distancePath.lookPoints[i], distancePath.lookPoints[i+1]);
+        }
+        return distance;
     }
 
     private bool DoesVectorPointToTheRight(Vector3 vector)

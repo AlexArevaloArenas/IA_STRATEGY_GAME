@@ -295,11 +295,6 @@ public class Pathfinding : MonoBehaviour {
 		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, enemyUnits);
 	}
 
-	private float GetDistanceBetweenNodes(GridNode n1, GridNode n2)
-	{
-		
-	}
-
 	public bool IsPlaceAvailable(GridNode currentNode,float moveRange,Vector3 target, bool[,] revisedNodeMatrix)
 	{
         // Si el nodo actual es el mismo que el nodo objetivo, devolver true
@@ -342,4 +337,7 @@ public class Pathfinding : MonoBehaviour {
         return false;
 
     }
+
+
+
 }
