@@ -161,7 +161,7 @@ public class MoveToEnemyStrategy : IActionStrategy
         GameManager.Instance.unitsUsed += 1;
         if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
         {
-            GameManager.Instance.GoapAgent.EndTurn();
+            GameManager.Instance.EndAITurn();
         }
         else GameManager.Instance.GoapAgent.TurnStart();
 
