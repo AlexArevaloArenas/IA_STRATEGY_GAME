@@ -99,6 +99,7 @@ public class MoveToEnemyStrategy : IActionStrategy
                     if (bestSafePlaces[i].worldPosition == null) Debug.Log("SAFE PLACE HIJO PUTA");
                     if (targetEnemy == null) Debug.Log("TARGET HIJO PUTA");
                     float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+                    Debug.Log("DISTANCIA: " + distance);
                     if (distance < minDistance)
                     {
                         minDistance = distance;

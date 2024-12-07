@@ -171,7 +171,7 @@ public class Pathfinding : MonoBehaviour {
 
         }
 
-		UnityEngine.Debug.Log("ATTACKABLE ENEMIES: " + attackableEnemies.Count);
+		//UnityEngine.Debug.Log("ATTACKABLE ENEMIES: " + attackableEnemies.Count);
 
     }
 
@@ -351,8 +351,8 @@ public class Pathfinding : MonoBehaviour {
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
-        GridNode startNode = grid.NodeFromWorldPoint(request.pathStart);
-        GridNode targetNode = grid.NodeFromWorldPoint(request.pathEnd);
+        GridNode startNode = grid.NodeFromWorldPoint(n1);
+        GridNode targetNode = grid.NodeFromWorldPoint(n2);
         startNode.parent = startNode;
 
 
@@ -399,11 +399,31 @@ public class Pathfinding : MonoBehaviour {
         }
         if (pathSuccess)
         {
-            //waypoints = RetracePath(startNode, targetNode);
+            waypoints = RetracePathDistance(startNode, targetNode);
             pathSuccess = waypoints.Length > 0;
         }
 		return waypoints;
 
     }
+	
+	Vector3[] RetracePathDistance(GridNode startNode, GridNode endNode) {
+		List<GridNode> path = new List<GridNode>();
+        GridNode currentNode = endNode;
+		
+		while (currentNode != startNode) {
+			path.Add(currentNode);
+			currentNode = currentNode.parent;
+		}
 
+		Vector3[] waypoints = new Vector3[path.Count];
+
+		for(int i = 0; path.Count > i; i++)
+		{
+			waypoints[i] = path[i].worldPosition;
+		}
+		//Vector3[] waypoints = SimplifyPath(path);
+		Array.Reverse(waypoints);
+		return waypoints;
+		
+	}
 }
