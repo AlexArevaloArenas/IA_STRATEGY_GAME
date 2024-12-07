@@ -15,9 +15,10 @@ public class Pathfinding : MonoBehaviour {
 	public LayerMask playerUnits;
 
 	public GameObject debugBola;
+    public GameObject debugBolaAzul;
 
-	
-	void Awake() {
+
+    void Awake() {
 		grid = GetComponent<Grid>();
 	}
 	
@@ -183,15 +184,14 @@ public class Pathfinding : MonoBehaviour {
 
 		FindSafePlaces(node, moveRange, enemies, revisedNodeMatrix, ref safePlaces, ref minDamage);
 
-		if(enemies.Count == 0)
-		{
-            foreach (GridNode n in safePlaces)
-            {
+        foreach (GridNode n in safePlaces)
+        {
 
-				Instantiate(debugBola, n.worldPosition, Quaternion.identity);
-            }
+            var esfera = Instantiate(debugBola, n.worldPosition, Quaternion.identity);
+            Destroy(esfera, 5f);
         }
 
+  
 		return safePlaces.ToArray();
 	}
 
@@ -252,7 +252,14 @@ public class Pathfinding : MonoBehaviour {
 
 		FindBestAttackPlace(node, moveRange, targetUnit, enemies, revisedNodeMatrix, ref bestAttackPlaces, ref minDamage, unitType);
 
-		return bestAttackPlaces.ToArray();
+        foreach (GridNode n in bestAttackPlaces)
+        {
+
+            var esfera = Instantiate(debugBolaAzul, n.worldPosition, Quaternion.identity);
+            Destroy(esfera, 5f);
+        }
+
+        return bestAttackPlaces.ToArray();
 	}
 
     private void FindBestAttackPlace(GridNode node, float moveRange, Unit targetUnit, List<Unit> enemies, bool[,] revisedNodeMatrix, ref List<GridNode> bestAttackPlaces, ref float minDamage, UnitType unitType)
@@ -282,8 +289,12 @@ public class Pathfinding : MonoBehaviour {
 
 			foreach (GridNode nn in neighbors)
 			{
-				float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
-				FindBestAttackPlace(nn, moveRange - distance, targetUnit, enemies, revisedNodeMatrix, ref bestAttackPlaces, ref minDamage, unitType);
+                if (nn.walkable)
+				{
+                    float distance = Vector3.Distance(nn.worldPosition, node.worldPosition);
+                    FindBestAttackPlace(nn, moveRange - distance, targetUnit, enemies, revisedNodeMatrix, ref bestAttackPlaces, ref minDamage, unitType);
+                }
+                    
 			}
 		}
 
@@ -293,7 +304,7 @@ public class Pathfinding : MonoBehaviour {
 	private bool CanAttackTarget(GridNode node, Unit targetUnit)
 	{
 		Vector3 direction = (targetUnit.transform.position - node.worldPosition).normalized;
-		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, enemyUnits);
+		return Physics.Raycast(node.worldPosition, direction, targetUnit.AttackRange, playerUnits);
 	}
 
 	public bool IsPlaceAvailable(GridNode currentNode,float moveRange,Vector3 target, bool[,] revisedNodeMatrix)

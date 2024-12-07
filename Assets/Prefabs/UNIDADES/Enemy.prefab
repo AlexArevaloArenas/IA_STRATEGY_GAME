@@ -52,10 +52,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0, z: 0}
   sprite: {fileID: 7325664293283164614}
-  speed: 3
+  speed: 5
   turnSpeed: 3
   turnDst: 1
-  stoppingDst: 5
+  stoppingDst: 2
 --- !u!114 &8700058154566253161
 MonoBehaviour:
   m_ObjectHideFlags: 0

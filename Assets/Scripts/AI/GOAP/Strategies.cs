@@ -72,7 +72,44 @@ public class MoveToEnemyStrategy : IActionStrategy
 
         if(bestAttackPlaces.Length > 0)
         {
-            Vector3 targetPosition = bestAttackPlaces[0].worldPosition;
+            Debug.Log("HAY SITIO PARA ATACAR");
+
+            float recordDistance = 0f;
+            int count = 0;
+            if(currentUnit.type == UnitType.Knight || currentUnit.type == UnitType.Pawn)
+            {
+                recordDistance = Mathf.Infinity;
+            }
+
+            for (int i = 0; i < bestAttackPlaces.Length; i++)
+            {
+                
+                float distance = agent.DistanceBetweenTwoNodes(bestAttackPlaces[i].worldPosition, targetEnemy.transform.position);
+                Debug.Log("DISTANCIA: " + distance);
+                if (currentUnit.type == UnitType.Knight || currentUnit.type == UnitType.Pawn) //Si es caballero o peon, se va al mas cercano
+                {
+                    if (distance < recordDistance)
+                    {
+                        recordDistance = distance;
+                        count = i;
+
+                    }
+                }
+
+                else //En caso contrario, va al mas lejano
+                {
+                    if (distance > recordDistance)
+                    {
+                        recordDistance = distance;
+                        count = i;
+
+                    }
+                }
+                
+            }
+
+
+            Vector3 targetPosition = bestAttackPlaces[count].worldPosition;
             agent.GoTo(targetPosition);
             moving = true;
             if (moving)
