@@ -25,6 +25,23 @@ public class Unit : MonoBehaviour
         pathfindingAgent = GetComponent<Agent>();
         viewRange = MoveRange;
     }
+    
+    private void Update(){
+
+        if(team == "Enemy")
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, viewRange, LayerMask.NameToLayer("Unit"));
+            foreach (var hitCollider in hitColliders)
+            {
+                if (!hitCollider.transform.parent.GetComponent<Unit>().visible)
+                {
+                    hitCollider.transform.parent.GetComponent<Unit>().visible = true;
+                    GameManager.Instance.TeamCheck();
+                }
+            }
+        }
+
+    }
 
     //HEALTHBARS
     [SerializeField] private Image hpBar;
@@ -171,29 +188,7 @@ public class Unit : MonoBehaviour
     }
 
 
-    void OnTriggerEnter(Collider other)
-    {
-
-        Unit otherUnit = other.gameObject.GetComponent<Unit>();
-        if(team == "Player"){ //Eres player y entra un enemigo
-
-            if (!otherUnit.visible && otherUnit.team == "Enemy")
-            {
-                otherUnit.visible = true;
-                GameManager.Instance.TeamCheck();
-            }
-        }
-
-        else{ //Eres enemigo y entra un player
-            if (!otherUnit.visible && otherUnit.team == "Player")
-            {
-                otherUnit.visible = true;
-                GameManager.Instance.TeamCheck();
-            }
-        }
-
-        
-    }
+   
 
 
 }

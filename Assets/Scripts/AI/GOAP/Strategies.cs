@@ -55,34 +55,13 @@ public class MoveToEnemyStrategy : IActionStrategy
 
         Debug.Log("MoveToEnemyStrategy");
 
-        if (currentUnit == null)
-        {
-            Debug.LogError("currentUnit is null");
-            return;
-        }
-
+        
         Agent agent = currentUnit.GetComponent<Agent>();
-        if (agent == null)
-        {
-            Debug.LogError("Agent component is missing on currentUnit");
-            return;
-        }
+       
 
         // First step: Find nearby enemies
         Unit[] nearbyEnemies = agent.EnemiesAvailable();
-        if (nearbyEnemies == null)
-        {
-            Debug.LogError("EnemiesAvailable returned null");
-            return;
-        }
-        Debug.Log("Nearby enemies: " + nearbyEnemies.Length);
-
-        if (targetEnemy == null)
-        {
-            Debug.LogError("targetEnemy is null");
-            return;
-        }
-
+    
         //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
 
         GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
@@ -113,9 +92,12 @@ public class MoveToEnemyStrategy : IActionStrategy
             {
                 float minDistance = Mathf.Infinity;
                 int count = 0;
-
+                
                 for (int i = 0; i < bestSafePlaces.Length; i++)
                 {
+                    if (agent == null) Debug.Log("AGENTE HIJO PUTA");
+                    if (bestSafePlaces[i].worldPosition == null) Debug.Log("SAFE PLACE HIJO PUTA");
+                    if (targetEnemy == null) Debug.Log("TARGET HIJO PUTA");
                     float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
                     if (distance < minDistance)
                     {

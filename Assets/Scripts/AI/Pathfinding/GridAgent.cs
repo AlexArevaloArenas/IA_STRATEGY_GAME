@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public class Agent : MonoBehaviour
 {
@@ -219,9 +220,21 @@ public class Agent : MonoBehaviour
     public float DistanceBetweenTwoNodes(Vector3 n1, Vector3 n2)   //DISTANCIA ENTRE DOS NODOS REAL, USANDO RUTAS
     {
         PathRequestManager.RequestPath(new PathRequest(n1, n2, DistanceOnPathFound));
+
+        float time = 0;
+        while(distancePath == null)
+        {
+            time += Time.deltaTime;
+            if(time >= 3f)
+            {
+                break;
+            }
+        }
         float distance = 0f;
-        for (int i = 0; i < distancePath.lookPoints.Length-1; i++) {
-            distance = distance + Vector3.Distance(distancePath.lookPoints[i], distancePath.lookPoints[i+1]);
+        if (distancePath == null) Debug.Log("ME PUTO SUICIDO");
+        for (int i = 0; i < distancePath.lookPoints.Length - 1; i++)
+        {
+            distance = distance + Vector3.Distance(distancePath.lookPoints[i], distancePath.lookPoints[i + 1]);
         }
         return distance;
     }
@@ -244,22 +257,23 @@ public class Agent : MonoBehaviour
         }
     }
 
+    
 }
-    /*GameObject[] GetEnemiesInRange( Unit UnidadSeleccionada, GameObject[] listaUnidadesJugador) {
-		
-        //nodoUnidadSeleccionada: Unidad controlada por la ia de la que quieres comprobar a quién puede atacar
-        //listaUnidadesJugador: lista con todas las unidades VISIBLES* del jugador  *(si al final pasamos de la niebla de guerra, ignorar lo de visibles)
-        
+/*GameObject[] GetEnemiesInRange( Unit UnidadSeleccionada, GameObject[] listaUnidadesJugador) {
 
-	 	//para cada iteración, crea un clon, le hace moverse la distancia máxima haca el enemigo, y entonces hace un raycast para ver si hay un obstáculo 
-        //entre medias, si da, entonces se añade ese enemigo al array de enemigosAtacables, y si no, pues nada 
-        
-        float attackRange = UnidadSeleccionada.AttackRange;
-        float attackDamage = UnidadSeleccionada.AttackDamage;
+    //nodoUnidadSeleccionada: Unidad controlada por la ia de la que quieres comprobar a quién puede atacar
+    //listaUnidadesJugador: lista con todas las unidades VISIBLES* del jugador  *(si al final pasamos de la niebla de guerra, ignorar lo de visibles)
 
-		foreach (Unit in UnidadSeleccionada)
-		{
-			
-		}
-	}*/
+
+    //para cada iteración, crea un clon, le hace moverse la distancia máxima haca el enemigo, y entonces hace un raycast para ver si hay un obstáculo 
+    //entre medias, si da, entonces se añade ese enemigo al array de enemigosAtacables, y si no, pues nada 
+
+    float attackRange = UnidadSeleccionada.AttackRange;
+    float attackDamage = UnidadSeleccionada.AttackDamage;
+
+    foreach (Unit in UnidadSeleccionada)
+    {
+
+    }
+}*/
 
