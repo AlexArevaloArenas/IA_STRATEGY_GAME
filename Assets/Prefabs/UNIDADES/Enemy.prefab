@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8700058154566253161}
   - component: {fileID: 365552655693503404}
   - component: {fileID: 3364667174868928724}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3210242818903387731}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: SelectObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -149,7 +149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1888964978155083776}
   - component: {fileID: 5319774216267385740}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: select
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 636067658625099099}
   - component: {fileID: 8580480122650188752}
   - component: {fileID: 5096147839731175044}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: 'Sprite '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -335,7 +335,7 @@ GameObject:
   - component: {fileID: 4423365497121256731}
   - component: {fileID: 5719941845494547069}
   - component: {fileID: 2795470650582556945}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
