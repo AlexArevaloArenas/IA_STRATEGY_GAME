@@ -44,6 +44,8 @@ public class GoapAgent : MonoBehaviour
     List<Unit> allies;
     List<Unit> enemies;
 
+    List<Unit> playedUnits;
+
     bool fleeEnemy;
 
     //Mecanica resureccion
@@ -89,6 +91,7 @@ public class GoapAgent : MonoBehaviour
     {
         allies = GameManager.Instance.visibleAliveEnemyTeam;
         enemies = GameManager.Instance.visibleAlivePlayerTeam;
+        playedUnits = new List<Unit>();
         SetupGOAP();
         AITurn = false;
         
@@ -134,6 +137,12 @@ public class GoapAgent : MonoBehaviour
         AITurn = true;
         interacting = false;
         
+
+    }
+
+    public void EndTurn(){
+        playedUnits.Clear();
+        GameManager.Instance.EndAITurn();
 
     }
 
@@ -613,44 +622,45 @@ public class GoapAgent : MonoBehaviour
         List<Unit> strongestUnits = new List<Unit>();
         Unit selectedUnit = null;
 
-        switch(currentEnemy.type){
-
+        switch(currentEnemy.type)
+        {
             case UnitType.Archer:
-                strongestUnits = allies.Where(u => u.type == UnitType.Knight).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Knight && !playedUnits.Contains(u)).ToList();
                 break;
 
             case UnitType.Mage:
-                strongestUnits = allies.Where(u => u.type == UnitType.Archer).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Archer && !playedUnits.Contains(u)).ToList();
                 break;
 
             case UnitType.Knight:
-                strongestUnits = allies.Where(u => u.type == UnitType.Mage).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Mage && !playedUnits.Contains(u)).ToList();
                 break;
 
             default:
-                strongestUnits = allies.Where(u => u.type == UnitType.Pawn).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Pawn && !playedUnits.Contains(u)).ToList();
                 break;
         }
-            selectedUnit = CalculateViableEnemy(strongestUnits, currentEnemy);
 
-            // If no strongest unit is found, select a Pawn
-            if (selectedUnit == null)
-            {
-                selectedUnit = allies
-                    .Where(u => u.type == UnitType.Pawn)
-                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
-                    .FirstOrDefault();
-            }
+        selectedUnit = CalculateViableEnemy(strongestUnits, currentEnemy);
 
-            // If no Pawn is found, select the closest weaker unit
-            if (selectedUnit == null)
-            {
-                selectedUnit = allies
-                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
-                    .FirstOrDefault();
-            }
-            
-        
+        // If no strongest unit is found, select a Pawn
+        if (selectedUnit == null)
+        {
+            selectedUnit = allies.FirstOrDefault(u => u.type == UnitType.Pawn && !playedUnits.Contains(u));
+        }
+
+        // If no Pawn is found, select any available unit that hasn't been played
+        if (selectedUnit == null)
+        {
+            selectedUnit = allies.FirstOrDefault(u => !playedUnits.Contains(u));
+        }
+
+        // Add the selected unit to the list of played units
+        if (selectedUnit != null)
+        {
+            playedUnits.Add(selectedUnit);
+        }
+
         return selectedUnit;
     }
 
