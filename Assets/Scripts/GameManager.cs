@@ -219,13 +219,13 @@ public class GameManager : MonoBehaviour {
         visibleAliveEnemyTeam.Clear();
         //&& u.visible
         foreach (Unit u in playerTeam) {
-            if (u.currentHealth>0 )
+            if (u.currentHealth>0 && u.visible)
             {
                 visibleAlivePlayerTeam.Add(u);
             } 
         }
         foreach (Unit u in enemyTeam) {
-            if (u.currentHealth > 0 )
+            if (u.currentHealth > 0 && u.visible)
             {
                 visibleAliveEnemyTeam.Add(u);
             }            

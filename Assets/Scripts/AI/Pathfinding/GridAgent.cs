@@ -216,9 +216,9 @@ public class Agent : MonoBehaviour
         return PathRequestManager.FindSafePlaces(transform.position, GetComponent<Unit>().MoveRange, enemies); 
     }
 
-    public float DistanceBetweenTwoNodes()   //DISTANCIA ENTRE DOS NODOS REAL, USANDO RUTAS
+    public float DistanceBetweenTwoNodes(Vector3 n1, Vector3 n2)   //DISTANCIA ENTRE DOS NODOS REAL, USANDO RUTAS
     {
-        PathRequestManager.RequestPath(new PathRequest(transform.position, target, DistanceOnPathFound));
+        PathRequestManager.RequestPath(new PathRequest(n1, n2, DistanceOnPathFound));
         float distance = 0f;
         for (int i = 0; i < distancePath.lookPoints.Length-1; i++) {
             distance = distance + Vector3.Distance(distancePath.lookPoints[i], distancePath.lookPoints[i+1]);

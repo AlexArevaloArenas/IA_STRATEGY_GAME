@@ -203,6 +203,11 @@ PrefabInstance:
       propertyPath: sprite
       value: 
       objectReference: {fileID: 7987894487872913216}
+    - target: {fileID: 7252722962369103273, guid: 3bfbf17c589bd9749b88d0e65de2add4,
+        type: 3}
+      propertyPath: m_Radius
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7725858923192856100, guid: 3bfbf17c589bd9749b88d0e65de2add4,
         type: 3}
       propertyPath: m_Name

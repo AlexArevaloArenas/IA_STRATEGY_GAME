@@ -170,6 +170,32 @@ public class Unit : MonoBehaviour
         GetComponent<Unit>().enabled = false;
     }
 
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        Unit otherUnit = other.gameObject.GetComponent<Unit>();
+        if(team == "Player"){ //Eres player y entra un enemigo
+
+            if (!otherUnit.visible && otherUnit.team == "Enemy")
+            {
+                otherUnit.visible = true;
+                GameManager.Instance.TeamCheck();
+            }
+        }
+
+        else{ //Eres enemigo y entra un player
+            if (!otherUnit.visible && otherUnit.team == "Player")
+            {
+                otherUnit.visible = true;
+                GameManager.Instance.TeamCheck();
+            }
+        }
+
+        
+    }
+
+
 }
 
 public enum UnitType
@@ -179,3 +205,5 @@ public enum UnitType
     Archer,
     Pawn
 }
+
+
