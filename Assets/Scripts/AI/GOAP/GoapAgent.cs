@@ -36,12 +36,15 @@ public class GoapAgent : MonoBehaviour
 
 
     public bool AITurn;
+    public bool interacting;
     Unit currentUnit;
     Unit enemyUnit;
     Unit deadUnit;
 
     List<Unit> allies;
     List<Unit> enemies;
+
+    //List<Unit> playedUnits;
 
     bool fleeEnemy;
 
@@ -88,6 +91,7 @@ public class GoapAgent : MonoBehaviour
     {
         allies = GameManager.Instance.visibleAliveEnemyTeam;
         enemies = GameManager.Instance.visibleAlivePlayerTeam;
+        //playedUnits = new List<Unit>();
         SetupGOAP();
         AITurn = false;
         
@@ -105,16 +109,18 @@ public class GoapAgent : MonoBehaviour
 
     public void TurnStart()     //This function is called EVERY TURN AI PLAYS
     {
-        
+
         //allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
         //enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
-        allies = GameManager.Instance.visibleAliveEnemyTeam;
-        enemies = GameManager.Instance.visibleAlivePlayerTeam;
+        //allies = GameManager.Instance.visibleAliveEnemyTeam;
+        //enemies = GameManager.Instance.visibleAlivePlayerTeam;
+        allies = GameManager.Instance.enemyTeam;
+        enemies = GameManager.Instance.playerTeam;
         canResurrect = CanResurrect(allies);
         if (!canResurrect)
         {
             enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
-            currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
+            currentUnit = SelectCurrentUnit(enemyUnit, allies); //se selecciona cualquier unidad de la IA (no solo visibles)
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
             Debug.Log("Enemy unit: " + enemyUnit);
             Debug.Log("Current unit: " + currentUnit);
@@ -126,11 +132,15 @@ public class GoapAgent : MonoBehaviour
             currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
         } 
 
-        ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
+        ClearGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
+        SetupGOAP();
         AITurn = true;
+        interacting = false;
         
 
     }
+
+    
 
     void SetupBeliefs()
     {
@@ -419,20 +429,20 @@ public class GoapAgent : MonoBehaviour
     }
     */
 
-    void ResetGOAP()
+    void ClearGOAP()
     {
         currentAction = null;
         currentGoal = null;
         beliefs.Clear();
         actions.Clear();
         goals.Clear();
-        SetupGOAP();
     }
 
     void Update(){
 
         AITurn = GameManager.Instance.isEnemyTurn;
         if (!AITurn) return;
+        if (interacting) return; //in middle of a strategy we dont want to calculate more
 
         //statsTimer.Tick(Time.deltaTime);
 
@@ -456,7 +466,8 @@ public class GoapAgent : MonoBehaviour
                 else
                 {
                     Debug.Log("Preconditions not met, clearing current action and goal");
-                    ResetGOAP();
+                    currentAction = null;
+                    currentGoal = null;
                 }
             }
 
@@ -565,12 +576,14 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
     {
+        /*
         if (enemies == null || enemies.Count == 0) //Para la estrategia de EXPLORAR
         {
             Debug.Log("LISTA JUGADOR VISIBLES ES 0");
             int i = Random.Range(0, GameManager.Instance.playerTeam.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
             return GameManager.Instance.playerTeam[i];
         }
+        */
 
         bool isAggressive = allies.Count < enemies.Count; // If we have less allies than enemies, AI plays agressive
 
@@ -593,18 +606,20 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
     {
+        /*
         if (enemies.Count == 0) //Vista visible del jugador (lo que ve la IA)
         {
             int i = Random.Range(0, GameManager.Instance.enemyTeam.Count); //Unidad random para jugar 
             return GameManager.Instance.enemyTeam[i];
         }
+        */
 
 
         List<Unit> strongestUnits = new List<Unit>();
         Unit selectedUnit = null;
 
-        switch(currentEnemy.type){
-
+        switch(currentEnemy.type)
+        {
             case UnitType.Archer:
                 strongestUnits = allies.Where(u => u.type == UnitType.Knight).ToList();
                 break;
@@ -621,26 +636,26 @@ public class GoapAgent : MonoBehaviour
                 strongestUnits = allies.Where(u => u.type == UnitType.Pawn).ToList();
                 break;
         }
-            selectedUnit = CalculateViableEnemy(strongestUnits, currentEnemy);
 
-            // If no strongest unit is found, select a Pawn
-            if (selectedUnit == null)
-            {
-                selectedUnit = allies
-                    .Where(u => u.type == UnitType.Pawn)
-                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
-                    .FirstOrDefault();
-            }
+        selectedUnit = CalculateViableEnemy(strongestUnits, currentEnemy);
 
-            // If no Pawn is found, select the closest weaker unit
-            if (selectedUnit == null)
-            {
-                selectedUnit = allies
-                    .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
-                    .FirstOrDefault();
-            }
-            
-        
+        // If no strongest unit is found, select a Pawn
+        if (selectedUnit == null)
+        {
+            selectedUnit = allies
+                .Where(u => u.type == UnitType.Pawn)
+                .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
+                .FirstOrDefault();
+        }
+
+        // If no Pawn is found, select any available unit that hasn't been played
+        if (selectedUnit == null)
+        {
+            selectedUnit = allies
+                .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
+                .FirstOrDefault();
+        }
+
         return selectedUnit;
     }
 

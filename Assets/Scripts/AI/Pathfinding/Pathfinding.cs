@@ -137,8 +137,8 @@ public class Pathfinding : MonoBehaviour {
             revisedNodeMatrix[node.gridX, node.gridY] = true;
 
 			foreach (Unit u in enemies) {
-
-				if (Physics.Raycast(node.worldPosition, node.worldPosition - u.transform.position, attackRange, enemyUnits))
+                UnityEngine.Debug.DrawRay(node.worldPosition, (u.transform.position - node.worldPosition).normalized, Color.green, 2, false);
+                if (Physics.Raycast(node.worldPosition, (u.transform.position - node.worldPosition).normalized, attackRange, enemyUnits))
 				{
                     if (!attackableEnemies.Contains(u))
                     {
@@ -154,11 +154,14 @@ public class Pathfinding : MonoBehaviour {
 				float distance = Vector3.Distance(nn.worldPosition,node.worldPosition);
                 if (moveRange - distance > 0) // Add this check to prevent infinite recursion
 				{
+					
 					FindAvailableEnemies(nn, moveRange - distance, attackRange, ref attackableEnemies, revisedNodeMatrix, enemies);
 				}
             }
 
         }
+
+		UnityEngine.Debug.Log("ATTACKABLE ENEMIES: " + attackableEnemies.Count);
 
     }
 

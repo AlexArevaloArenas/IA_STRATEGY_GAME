@@ -35,6 +35,7 @@ public class MoveToEnemyStrategy : IActionStrategy
     readonly Unit currentUnit;
     readonly Unit targetEnemy;
     bool complete;
+    bool moving;
 
     public bool CanPerform => !complete;
     public bool Complete => complete;
@@ -50,6 +51,7 @@ public class MoveToEnemyStrategy : IActionStrategy
 
     public void Start()
     {
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
 
         Debug.Log("MoveToEnemyStrategy");
 
@@ -91,8 +93,15 @@ public class MoveToEnemyStrategy : IActionStrategy
 
         if(bestAttackPlaces.Length > 0)
         {
-            currentUnit.GetComponent<Agent>().GoTo(bestAttackPlaces[0].worldPosition); 
-            complete = true; //Hay que esperar antes de pasar de turno
+            Vector3 targetPosition = bestAttackPlaces[0].worldPosition;
+            agent.GoTo(targetPosition);
+            moving = true;
+            if (moving)
+            {
+                moving = false;
+                agent.StartCoroutine(WaitUntilReached(agent, targetPosition));
+            }
+            
         }
 
         else
@@ -116,24 +125,53 @@ public class MoveToEnemyStrategy : IActionStrategy
                     }
                 }
 
-                currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+                Vector3 targetPosition = bestSafePlaces[count].worldPosition;
+
+                agent.GoTo(targetPosition);
+                moving = true;
+                if (moving)
+                {
+                    moving = false;
+                    agent.StartCoroutine(WaitUntilReached(agent, targetPosition));
+                }
+               
 
             }
-            complete = true;
+            
 
         }
 
         
     }
 
-    public void Stop()
+    private System.Collections.IEnumerator WaitUntilReached(Agent agent, Vector3 targetPosition)
     {
+        /*
+        while (!agent.HasReachedDestination())
+        {
+            yield return null;
+        }
+        */
+
+        yield return new WaitForSeconds(3f); //Delay timer between moves
+
+        complete = true;
+        moving = false;
+        Debug.Log("SE HA ACABAO");
         GameManager.Instance.unitsUsed += 1;
-        Debug.Log("Units used: " + GameManager.Instance.unitsUsed);
         if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
         {
             GameManager.Instance.EndAITurn();
         }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
+
+    }
+
+    public void Stop()
+    {
+        
     }
 
 

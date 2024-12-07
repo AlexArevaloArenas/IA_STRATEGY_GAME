@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3364667174868928724}
   m_Layer: 8
   m_Name: Enemy
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -86,7 +86,7 @@ MonoBehaviour:
   MaxHealth: 5
   currentHealth: 0
   AttackDamage: 5
-  AttackRange: 3
+  AttackRange: 1
   MoveRange: 3
   team: Enemy
   hpBar: {fileID: 0}

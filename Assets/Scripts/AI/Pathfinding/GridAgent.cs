@@ -148,10 +148,12 @@ public class Agent : MonoBehaviour
                 }
 
             }
-
+            
             yield return null;
 
         }
+
+        
     }
 
     public void OnDrawGizmos()

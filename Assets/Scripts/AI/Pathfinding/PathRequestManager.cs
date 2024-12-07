@@ -46,20 +46,21 @@ public class PathRequestManager : MonoBehaviour {
         }
     }
 
-    //Method to find all enemies
-    private static Unit[] FindAllEnemies() {
-    GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
-    List<Unit> enemyUnits = new List<Unit>();
+    //Method to find all enemies (player)
+    private static Unit[] FindAllEnemies() 
+    {
+        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Player");
+        List<Unit> enemyUnits = new List<Unit>();
 
-    foreach (GameObject enemyObject in enemyObjects) {
-        Unit unit = enemyObject.GetComponent<Unit>();
-        if (unit != null) {
-            enemyUnits.Add(unit);
+        foreach (GameObject enemyObject in enemyObjects) {
+            Unit unit = enemyObject.GetComponent<Unit>();
+            if (unit != null) {
+                enemyUnits.Add(unit);
+            }
         }
-    }
 
-    return enemyUnits.ToArray();
-}
+        return enemyUnits.ToArray();
+    }
 
     public static Unit[] FindEnemiesAvailable(Vector3 pos, float moveRange, float attackRange)
     {
