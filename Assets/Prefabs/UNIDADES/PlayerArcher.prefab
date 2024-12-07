@@ -214,6 +214,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerArcher
       objectReference: {fileID: 0}
+<<<<<<< HEAD
     - target: {fileID: 5409147998094856621, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
         type: 3}
       propertyPath: m_Sprite
@@ -224,6 +225,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+=======
+    - target: {fileID: 5196548138225542216, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
+        type: 3}
+      propertyPath: m_TagString
+      value: Player
+>>>>>>> 39b40069961a3318e75dcee84cac67160246549c
       objectReference: {fileID: 0}
     - target: {fileID: 6116105758803315063, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
         type: 3}
