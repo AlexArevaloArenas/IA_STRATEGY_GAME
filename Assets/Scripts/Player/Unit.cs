@@ -23,33 +23,30 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
-        viewRange = MoveRange;
+        viewRange = MoveRange * 3;
     }
     
     private void Update(){
 
+        
         if(team == "Enemy")
         {
-            int layerMask = LayerMask.GetMask("Unit");
+            if(GameManager.Instance.visibleAlivePlayerTeam.Count < 5){
 
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, viewRange);
-            foreach (var hitCollider in hitColliders)
-            {
-                
-                if(hitCollider.gameObject.name == "Capsule")
-                {
-                    Debug.Log("Me cago encima parte 2");
-                    if (!hitCollider.transform.parent.GetComponent<Unit>().visible)
-                    {
-                        Debug.Log("Me cago encima parte 3");
-                        hitCollider.gameObject.transform.parent.GetComponent<Unit>().visible = true;
-                        GameManager.Instance.TeamCheck();
+                for(int i = 0; i < GameManager.Instance.playerTeam.Count; i++){
+
+                    Unit unit = GameManager.Instance.playerTeam[i];
+                    Debug.Log("Unit: " + unit);
+                    if(!unit.visible && Vector3.Distance(transform.position, unit.transform.position) <= viewRange){
+                        Debug.Log("Te ha pillao " + gameObject.name);
+                        Debug.Log("Unit pillada: " + unit);
+                        unit.visible = true;
+                        GameManager.Instance.visibleAlivePlayerTeam.Add(unit);
                     }
                 }
-                
             }
         }
-
+        
     }
 
     //HEALTHBARS
