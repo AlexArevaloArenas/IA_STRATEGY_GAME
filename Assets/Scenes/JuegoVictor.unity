@@ -270,10 +270,10 @@ MonoBehaviour:
   grid: {fileID: 0}
   enemyUnits:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   playerUnits:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!114 &39835986
 MonoBehaviour:
   m_ObjectHideFlags: 0
