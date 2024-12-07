@@ -39,20 +39,49 @@ public class MoveToEnemyStrategy : IActionStrategy
     public bool CanPerform => !complete;
     public bool Complete => complete;
 
+    
+
     public MoveToEnemyStrategy(Unit currentUnit, Unit targetEnemy)
     {
         this.currentUnit = currentUnit;
         this.targetEnemy = targetEnemy;
+        Debug.Log("Dios me ayude");
     }
 
     public void Start()
     {
+
+        Debug.Log("MoveToEnemyStrategy");
+
+        if (currentUnit == null)
+        {
+            Debug.LogError("currentUnit is null");
+            return;
+        }
+
+        Agent agent = currentUnit.GetComponent<Agent>();
+        if (agent == null)
+        {
+            Debug.LogError("Agent component is missing on currentUnit");
+            return;
+        }
+
         // First step: Find nearby enemies
-        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+        Unit[] nearbyEnemies = agent.EnemiesAvailable();
+        if (nearbyEnemies == null)
+        {
+            Debug.LogError("EnemiesAvailable returned null");
+            return;
+        }
+        Debug.Log("Nearby enemies: " + nearbyEnemies.Length);
+
+        if (targetEnemy == null)
+        {
+            Debug.LogError("targetEnemy is null");
+            return;
+        }
 
         //POSSIBILITY: Instead of goap agent having a target enemy per default, calculate the target enemy in this step
-
-
 
         GridNode[] bestAttackPlaces = currentUnit.GetComponent<Agent>().FindBestAttackPlaces(
             targetEnemy,
@@ -95,6 +124,16 @@ public class MoveToEnemyStrategy : IActionStrategy
         }
 
         
+    }
+
+    public void Stop()
+    {
+        GameManager.Instance.unitsUsed += 1;
+        Debug.Log("Units used: " + GameManager.Instance.unitsUsed);
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
     }
 
 

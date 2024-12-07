@@ -34,6 +34,8 @@ public class GoapAgent : MonoBehaviour
 
     CountdownTimer statsTimer;
 
+
+    public bool AITurn;
     Unit currentUnit;
     Unit enemyUnit;
     Unit deadUnit;
@@ -84,8 +86,10 @@ public class GoapAgent : MonoBehaviour
 
     void Start()
     {
-        
+        allies = GameManager.Instance.visibleAliveEnemyTeam;
+        enemies = GameManager.Instance.visibleAlivePlayerTeam;
         SetupGOAP();
+        AITurn = false;
         
         
     }
@@ -101,7 +105,7 @@ public class GoapAgent : MonoBehaviour
 
     public void TurnStart()     //This function is called EVERY TURN AI PLAYS
     {
-        ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
+        
         //allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
         //enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
         allies = GameManager.Instance.visibleAliveEnemyTeam;
@@ -109,8 +113,8 @@ public class GoapAgent : MonoBehaviour
         canResurrect = CanResurrect(allies);
         if (!canResurrect)
         {
-            enemyUnit = SelectMostDangerousUnit(allies, enemies);
-            currentUnit = SelectCurrentUnit(enemyUnit, allies);
+            enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
+            currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
             Debug.Log("Enemy unit: " + enemyUnit);
             Debug.Log("Current unit: " + currentUnit);
@@ -119,8 +123,12 @@ public class GoapAgent : MonoBehaviour
 
         else {
             resurrectedUnit = SelectResurrectType(allies, enemies);
-            currentUnit = SelectCurrentUnit(enemyUnit, allies);
+            currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
         } 
+
+        ResetGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
+        AITurn = true;
+        
 
     }
 
@@ -153,15 +161,15 @@ public class GoapAgent : MonoBehaviour
 
         factory.AddBelief("Nothing", () => false);
 
-        factory.AddBelief("Explore", () => enemyUnit == null);
+        factory.AddBelief("Explore", () => enemies.Count == 0);
 
         //No llega el raycast de ataque al enemigo
-        factory.AddBelief("CanMoveToEnemy", () => enemyUnit != null && 
+        factory.AddBelief("CanMoveToEnemy", () => enemyUnit != null && currentUnit!= null && 
         !Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, 
             currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
 
         //Llega el raycast de ataque al enemigo
-        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null &&
+        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && currentUnit != null &&
         Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized,
             currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
 
@@ -206,10 +214,10 @@ public class GoapAgent : MonoBehaviour
         
 
         actions.Add(new AgentAction.Builder("MoveToEnemy")
-            .WithStrategy(new MoveToEnemyStrategy(currentUnit, enemyUnit))
-            .AddPrecondition(beliefs["CanMoveToEnemy"])
-            //.AddEffect(beliefs["CanMoveToEnemy"])
-            .Build());
+        .WithStrategy(new MoveToEnemyStrategy(currentUnit, enemyUnit))
+        .AddPrecondition(beliefs["CanMoveToEnemy"])
+        .AddEffect(beliefs["CanAttackEnemy"]) // Ensure the effect is correctly set
+        .Build());
 
         actions.Add(new AgentAction.Builder("AttackPlayer")
             .WithStrategy(new AttackStrategy(currentUnit, enemyUnit))
@@ -248,35 +256,35 @@ public class GoapAgent : MonoBehaviour
         goals = new HashSet<AgentGoal>();
 
         goals.Add(new AgentGoal.Builder("FleeFromEnemyTarget") //Flee: Priority 4
-           .WithPriority(4)
+           .WithPriority(6)
            .WithDesiredEffect(beliefs["FleeFromEnemy"])
            .Build());
 
         goals.Add(new AgentGoal.Builder("MoveToDeadAlly") //Resurrect: Priority 3
-            .WithPriority(3)
+            .WithPriority(5)
             .WithDesiredEffect(beliefs["MoveToDeadAlly"])
             .Build());
 
 
         goals.Add(new AgentGoal.Builder("CanResurrect")
-            .WithPriority(3)
+            .WithPriority(4)
             .WithDesiredEffect(beliefs["CanResurrect"])
             .Build());
 
 
         goals.Add(new AgentGoal.Builder("AttackEnemyTarget") //Attack: Priority 2
-            .WithPriority(2)
+            .WithPriority(3)
             .WithDesiredEffect(beliefs["CanAttackEnemy"])
             .Build());
 
 
-        goals.Add(new AgentGoal.Builder("MoveToEnemyTarget") //Move to enemy: Priority 1
-            .WithPriority(1)
-            .WithDesiredEffect(beliefs["CanMoveToEnemy"])
-            .Build());
+        goals.Add(new AgentGoal.Builder("MoveToEnemy")
+        .WithPriority(2)
+        .WithDesiredEffect(beliefs["CanAttackEnemy"]) // Ensure the desired effect matches the action's effect
+        .Build());
 
         goals.Add(new AgentGoal.Builder("Explore") //Explore: Priority 0
-            .WithPriority(0)
+            .WithPriority(1)
             .WithDesiredEffect(beliefs["Explore"])
             .Build());
     }
@@ -415,10 +423,18 @@ public class GoapAgent : MonoBehaviour
     {
         currentAction = null;
         currentGoal = null;
+        beliefs.Clear();
+        actions.Clear();
+        goals.Clear();
+        SetupGOAP();
     }
 
     void Update(){
-        statsTimer.Tick(Time.deltaTime);
+
+        AITurn = GameManager.Instance.isEnemyTurn;
+        if (!AITurn) return;
+
+        //statsTimer.Tick(Time.deltaTime);
 
         // Update the plan and current action if there is one
         if (currentAction == null)
@@ -541,8 +557,10 @@ public class GoapAgent : MonoBehaviour
         var potentialPlan = gPlanner.Plan(this, goalsToCheck, lastGoal);
         if (potentialPlan != null)
         {
+            
             actionPlan = potentialPlan;
         }
+
     }
 
     private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
@@ -550,8 +568,8 @@ public class GoapAgent : MonoBehaviour
         if (enemies == null || enemies.Count == 0) //Para la estrategia de EXPLORAR
         {
             Debug.Log("LISTA JUGADOR VISIBLES ES 0");
-            int i = Random.Range(0, enemies.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
-            return enemies[i];
+            int i = Random.Range(0, GameManager.Instance.playerTeam.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
+            return GameManager.Instance.playerTeam[i];
         }
 
         bool isAggressive = allies.Count < enemies.Count; // If we have less allies than enemies, AI plays agressive
@@ -577,8 +595,8 @@ public class GoapAgent : MonoBehaviour
     {
         if (enemies.Count == 0) //Vista visible del jugador (lo que ve la IA)
         {
-            int i = Random.Range(0, allies.Count); //Unidad random para jugar 
-            return allies[i];
+            int i = Random.Range(0, GameManager.Instance.enemyTeam.Count); //Unidad random para jugar 
+            return GameManager.Instance.enemyTeam[i];
         }
 
 

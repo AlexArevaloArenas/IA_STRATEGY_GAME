@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     bool victory = false;
     public bool isPlayerTurn;
     public bool isEnemyTurn;
-    [SerializeField] private int unitsPerTurn;
+    public int unitsPerTurn;
     public int unitsUsed;
     int teamSize;
 
@@ -236,6 +236,7 @@ public class GameManager : MonoBehaviour {
     {
         isPlayerTurn=true;
         isEnemyTurn=false;
+        unitsUsed = 0;
     }
 
 }
