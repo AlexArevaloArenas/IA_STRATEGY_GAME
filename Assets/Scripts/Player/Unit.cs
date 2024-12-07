@@ -30,14 +30,23 @@ public class Unit : MonoBehaviour
 
         if(team == "Enemy")
         {
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, viewRange, LayerMask.NameToLayer("Unit"));
+            int layerMask = LayerMask.GetMask("Unit");
+
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, viewRange);
             foreach (var hitCollider in hitColliders)
             {
-                if (!hitCollider.transform.parent.GetComponent<Unit>().visible)
+                
+                if(hitCollider.gameObject.name == "Capsule")
                 {
-                    hitCollider.transform.parent.GetComponent<Unit>().visible = true;
-                    GameManager.Instance.TeamCheck();
+                    Debug.Log("Me cago encima parte 2");
+                    if (!hitCollider.transform.parent.GetComponent<Unit>().visible)
+                    {
+                        Debug.Log("Me cago encima parte 3");
+                        hitCollider.gameObject.transform.parent.GetComponent<Unit>().visible = true;
+                        GameManager.Instance.TeamCheck();
+                    }
                 }
+                
             }
         }
 

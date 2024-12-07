@@ -82,7 +82,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 1
   type: 3
-  viewRange: 3
+  viewRange: 1000
   MaxHealth: 5
   currentHealth: 0
   AttackDamage: 5

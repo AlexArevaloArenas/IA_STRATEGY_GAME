@@ -112,15 +112,15 @@ public class GoapAgent : MonoBehaviour
 
         //allies = GameManager.Instance.enemyTeam.ToList(); //allies = AI (enemy team)
         //enemies = GameManager.Instance.playerTeam.ToList(); //enemies = Player (player team)
-        //allies = GameManager.Instance.visibleAliveEnemyTeam;
-        //enemies = GameManager.Instance.visibleAlivePlayerTeam;
-        allies = GameManager.Instance.enemyTeam;
-        enemies = GameManager.Instance.playerTeam;
+        allies = GameManager.Instance.visibleAliveEnemyTeam;
+        enemies = GameManager.Instance.visibleAlivePlayerTeam;
+        //allies = GameManager.Instance.enemyTeam;
+        //enemies = GameManager.Instance.playerTeam;
         canResurrect = CanResurrect(allies);
         if (!canResurrect)
         {
             enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
-            currentUnit = SelectCurrentUnit(enemyUnit, allies); //se selecciona cualquier unidad de la IA (no solo visibles)
+            currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
             Debug.Log("Enemy unit: " + enemyUnit);
             Debug.Log("Current unit: " + currentUnit);
@@ -173,8 +173,10 @@ public class GoapAgent : MonoBehaviour
 
         factory.AddBelief("Explore", () => enemies.Count == 0);
 
+        factory.AddBelief("Exploring", () => true);
+
         //No llega el raycast de ataque al enemigo
-        factory.AddBelief("CanMoveToEnemy", () => enemyUnit != null && currentUnit!= null && 
+        factory.AddBelief("CanMoveToEnemy", () => enemies.Count != 0 && enemyUnit != null && currentUnit!= null && 
         !Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, 
             currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
 
@@ -219,7 +221,7 @@ public class GoapAgent : MonoBehaviour
         actions.Add(new AgentAction.Builder("Explore")
             .WithStrategy(new ExploreStrategy(currentUnit, enemyUnit))
             .AddPrecondition(beliefs["Explore"])
-            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .AddEffect(beliefs["Nothing"])
             .Build());
         
 
@@ -295,7 +297,7 @@ public class GoapAgent : MonoBehaviour
 
         goals.Add(new AgentGoal.Builder("Explore") //Explore: Priority 0
             .WithPriority(1)
-            .WithDesiredEffect(beliefs["Explore"])
+            .WithDesiredEffect(beliefs["Nothing"])
             .Build());
     }
 
@@ -576,14 +578,14 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
     {
-        /*
+        
         if (enemies == null || enemies.Count == 0) //Para la estrategia de EXPLORAR
         {
             Debug.Log("LISTA JUGADOR VISIBLES ES 0");
             int i = Random.Range(0, GameManager.Instance.playerTeam.Count); //Selecciona una unidad random enemiga para targetear (unidad no visible)
             return GameManager.Instance.playerTeam[i];
         }
-        */
+        
 
         bool isAggressive = allies.Count < enemies.Count; // If we have less allies than enemies, AI plays agressive
 
@@ -606,13 +608,13 @@ public class GoapAgent : MonoBehaviour
 
     private Unit SelectCurrentUnit(Unit currentEnemy, List<Unit> allies)
     {
-        /*
+        
         if (enemies.Count == 0) //Vista visible del jugador (lo que ve la IA)
         {
             int i = Random.Range(0, GameManager.Instance.enemyTeam.Count); //Unidad random para jugar 
             return GameManager.Instance.enemyTeam[i];
         }
-        */
+        
 
 
         List<Unit> strongestUnits = new List<Unit>();

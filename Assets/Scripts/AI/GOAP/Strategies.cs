@@ -166,13 +166,7 @@ public class MoveToEnemyStrategy : IActionStrategy
 
     private System.Collections.IEnumerator WaitUntilReached(Agent agent, Vector3 targetPosition)
     {
-        /*
-        while (!agent.HasReachedDestination())
-        {
-            yield return null;
-        }
-        */
-
+   
         yield return new WaitForSeconds(3f); //Delay timer between moves
 
         complete = true;
@@ -205,6 +199,7 @@ public class ExploreStrategy : IActionStrategy
     readonly Unit currentUnit;
     readonly Unit targetEnemy;
     bool complete;
+    bool moving;
 
     public bool CanPerform => !complete;
     public bool Complete => complete;
@@ -217,8 +212,14 @@ public class ExploreStrategy : IActionStrategy
 
     public void Start()
     {
+        Debug.Log("EXPLORO FLOROMACOBO");
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
+
+        Agent agent = currentUnit.GetComponent<Agent>();
+
+
         // First step: Find nearby enemies
-        Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
+        Unit[] nearbyEnemies = agent.EnemiesAvailable();
 
         // Second step: Find the best safe places considering all nearby enemies
         GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
@@ -230,7 +231,9 @@ public class ExploreStrategy : IActionStrategy
 
             for (int i = 0; i < bestSafePlaces.Length; i++)
             {
-                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+
+                float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+                Debug.Log("DISTANCIA: " + distance);
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -239,10 +242,36 @@ public class ExploreStrategy : IActionStrategy
                 }
             }
 
-            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+            Vector3 targetPosition = bestSafePlaces[count].worldPosition;
+
+            agent.GoTo(targetPosition);
+            moving = true;
+            if (moving)
+            {
+                moving = false;
+                agent.StartCoroutine(WaitUntilReached(agent, targetPosition));
+            }
 
         }
+
+    }
+
+    private System.Collections.IEnumerator WaitUntilReached(Agent agent, Vector3 targetPosition)
+    {
+
+        yield return new WaitForSeconds(3f); //Delay timer between moves
+
         complete = true;
+        moving = false;
+        Debug.Log("SE HA ACABAO");
+        GameManager.Instance.unitsUsed += 1;
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
 
     }
 

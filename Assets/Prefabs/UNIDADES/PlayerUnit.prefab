@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94eff1a84c6c1e345a1d0365e79e128a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visible: 1
+  visible: 0
   type: 3
   viewRange: 3
   MaxHealth: 5
