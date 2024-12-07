@@ -1329,6 +1329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AITurn: 0
+  interacting: 0
   knightPrefab: {fileID: 7566458750222692746, guid: 1de5f6b73476ea64599e28b8f639a6b0,
     type: 3}
   archerPrefab: {fileID: 2436386688610371278, guid: 1f965e6bd6bdbb947a0f70927f54a67d,
