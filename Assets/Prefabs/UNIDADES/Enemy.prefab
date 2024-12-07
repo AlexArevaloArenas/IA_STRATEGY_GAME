@@ -82,11 +82,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visible: 1
   type: 3
-  viewRange: 1000
+  viewRange: 9
   MaxHealth: 5
   currentHealth: 0
   AttackDamage: 5
-  AttackRange: 1
+  AttackRange: 2
   MoveRange: 3
   team: Enemy
   hpBar: {fileID: 0}

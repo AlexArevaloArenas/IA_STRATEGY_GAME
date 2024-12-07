@@ -36,7 +36,7 @@ public class Unit : MonoBehaviour
                 for(int i = 0; i < GameManager.Instance.playerTeam.Count; i++){
 
                     Unit unit = GameManager.Instance.playerTeam[i];
-                    Debug.Log("Unit: " + unit);
+                    //Debug.Log("Unit: " + unit);
                     if(!unit.visible && Vector3.Distance(transform.position, unit.transform.position) <= viewRange){
                         Debug.Log("Te ha pillao " + gameObject.name);
                         Debug.Log("Unit pillada: " + unit);
@@ -62,6 +62,93 @@ public class Unit : MonoBehaviour
             pathfindingAgent.GoTo(punto);
             GameManager.Instance.EndUnitAction();
         }   
+    }
+
+    public void AIAttack(Unit enemy) //Attack strategy for AI
+    {
+        UnitType enemytype = enemy.GetComponent<Unit>().type;
+        Debug.Log("Ataco!!");
+        switch (type)
+        {
+            case UnitType.Mage:
+                float heightMultiplier = 1;
+                if (transform.position.y > enemy.transform.position.y)
+                {
+                    heightMultiplier = 1.5f;
+                }
+                switch (enemytype)
+                {
+                    case UnitType.Mage:
+                        enemy.GetDamage(AttackDamage * heightMultiplier);
+                        break;
+                    case UnitType.Knight:
+                        enemy.GetDamage(AttackDamage * 2 * heightMultiplier);
+                        break;
+                    case UnitType.Archer:
+                        enemy.GetDamage((AttackDamage * heightMultiplier) / 2);
+                        break;
+                    case UnitType.Pawn:
+                        enemy.GetDamage(AttackDamage * heightMultiplier);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case UnitType.Knight:
+                switch (enemytype)
+                {
+                    case UnitType.Mage:
+
+                        enemy.GetDamage((AttackDamage) / 2);
+                        break;
+                    case UnitType.Knight:
+                        enemy.GetDamage(AttackDamage);
+                        break;
+                    case UnitType.Archer:
+
+                        enemy.GetDamage(AttackDamage * 2);
+                        break;
+                    case UnitType.Pawn:
+                        enemy.GetDamage(AttackDamage);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case UnitType.Archer:
+                float heightMultiplier3 = 1;
+                if (transform.position.y > enemy.transform.position.y)
+                {
+                    heightMultiplier = 1.5f;
+                }
+                switch (enemytype)
+                {
+                    case UnitType.Mage:
+                        enemy.GetDamage(AttackDamage * 2 * heightMultiplier3);
+                        break;
+                    case UnitType.Knight:
+
+                        enemy.GetDamage((AttackDamage * heightMultiplier3) / 2);
+                        break;
+                    case UnitType.Archer:
+                        enemy.GetDamage(AttackDamage * heightMultiplier3);
+
+                        break;
+                    case UnitType.Pawn:
+                        enemy.GetDamage(AttackDamage * heightMultiplier3);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case UnitType.Pawn:
+                enemy.GetDamage(AttackDamage);
+                break;
+            default:
+                break;
+
+        }
+
     }
 
     public void Attack(Unit enemy)
@@ -191,6 +278,7 @@ public class Unit : MonoBehaviour
     {
         transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.grey;
         GetComponent<Unit>().enabled = false;
+        GameManager.Instance.TeamCheck();
     }
 
 

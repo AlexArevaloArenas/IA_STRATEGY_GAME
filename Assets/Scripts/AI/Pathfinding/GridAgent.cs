@@ -234,7 +234,7 @@ public class Agent : MonoBehaviour
         float distance = 0f;
         for (int i = 0; i < path.Length - 1; i++)
         {
-            Debug.Log("ENTRAMOS EN EL PUTO BUCLE");
+            //Debug.Log("ENTRAMOS EN EL BUCLE");
             distance = distance + Vector3.Distance(path[i], path[i + 1]);
         }
         return distance;

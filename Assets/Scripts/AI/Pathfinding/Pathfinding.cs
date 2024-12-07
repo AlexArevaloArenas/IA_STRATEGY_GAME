@@ -146,7 +146,7 @@ public class Pathfinding : MonoBehaviour {
 				RaycastHit hit;
                 if (Physics.Raycast(node.worldPosition, (u.transform.position - node.worldPosition).normalized, out hit, attackRange, playerUnits))
 				{
-					UnityEngine.Debug.Log("HIT NAME: " + hit.collider.gameObject.name);
+					//UnityEngine.Debug.Log("HIT NAME: " + hit.collider.gameObject.name);
 					if (hit.collider.transform.parent.CompareTag("Player"))
 					{
                         if (!attackableEnemies.Contains(u))

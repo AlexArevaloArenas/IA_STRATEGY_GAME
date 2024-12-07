@@ -167,7 +167,7 @@ public class MoveToEnemyStrategy : IActionStrategy
     private System.Collections.IEnumerator WaitUntilReached(Agent agent, Vector3 targetPosition)
     {
    
-        yield return new WaitForSeconds(3f); //Delay timer between moves
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
 
         complete = true;
         moving = false;
@@ -233,7 +233,7 @@ public class ExploreStrategy : IActionStrategy
             {
 
                 float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
-                Debug.Log("DISTANCIA: " + distance);
+                //Debug.Log("DISTANCIA: " + distance);
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -259,7 +259,7 @@ public class ExploreStrategy : IActionStrategy
     private System.Collections.IEnumerator WaitUntilReached(Agent agent, Vector3 targetPosition)
     {
 
-        yield return new WaitForSeconds(3f); //Delay timer between moves
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
 
         complete = true;
         moving = false;
@@ -432,14 +432,36 @@ public class AttackStrategy : IActionStrategy
 
     public void Start()
     {
-        currentUnit.Attack(targetEnemy); //attacks
-        complete = true;
-        //TO DO: GameManager next turn
+        Debug.Log("ATACO EPICAMENTE");
+        Agent agent = currentUnit.GetComponent<Agent>();
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
+        currentUnit.AIAttack(targetEnemy); //attacks
+        agent.StartCoroutine(WaitUntilReached());
+ 
     }
 
     public void Update(float deltaTime) { }
 
     public void Stop() { }
+
+    private System.Collections.IEnumerator WaitUntilReached()
+    {
+
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
+
+        complete = true;
+        Debug.Log("HA ATACADO");
+        GameManager.Instance.unitsUsed += 1;
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
+
+    }
+
 }
 
 

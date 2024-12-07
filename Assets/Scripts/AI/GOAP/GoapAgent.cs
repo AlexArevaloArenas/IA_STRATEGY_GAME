@@ -37,8 +37,8 @@ public class GoapAgent : MonoBehaviour
 
     public bool AITurn;
     public bool interacting;
-    Unit currentUnit;
-    Unit enemyUnit;
+    [SerializeField] Unit currentUnit;
+    [SerializeField] Unit enemyUnit;
     Unit deadUnit;
 
     List<Unit> allies;
@@ -169,21 +169,43 @@ public class GoapAgent : MonoBehaviour
 
         // New beliefs
 
+        
+
+        
+        bool CanAttackEnemy = false;
+
+        if(currentUnit != null){ //TODO ESTO FUNCIONA BIEN
+
+            RaycastHit hit;
+            Debug.DrawRay(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized * currentUnit.AttackRange, Color.red, 2, false);
+
+            // Define the layer mask
+            LayerMask unitLayerMask = LayerMask.GetMask("Unit");
+            if (Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, out hit, currentUnit.AttackRange, unitLayerMask)){
+                
+                
+                if (hit.collider.transform.parent.CompareTag("Player"))
+                {
+                    CanAttackEnemy = true;
+                }
+            }
+
+            Debug.Log("Can attack enemy: " + CanAttackEnemy);
+
+            
+
+        }
+
         factory.AddBelief("Nothing", () => false);
 
-        factory.AddBelief("Explore", () => enemies.Count == 0);
+        factory.AddBelief("Explore", () => !CanAttackEnemy && enemies.Count >= 0);
 
-        factory.AddBelief("Exploring", () => true);
 
         //No llega el raycast de ataque al enemigo
-        factory.AddBelief("CanMoveToEnemy", () => enemies.Count != 0 && enemyUnit != null && currentUnit!= null && 
-        !Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, 
-            currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
+        factory.AddBelief("CanMoveToEnemy", () => enemies.Count != 0 && enemyUnit != null && currentUnit!= null && !CanAttackEnemy);
 
         //Llega el raycast de ataque al enemigo
-        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && currentUnit != null &&
-        Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized,
-            currentUnit.AttackRange, LayerMask.NameToLayer("Unit")));
+        factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && currentUnit != null && CanAttackEnemy);
 
         //Flee belief
         factory.AddBelief("FleeFromEnemy", () => fleeEnemy);
@@ -236,7 +258,7 @@ public class GoapAgent : MonoBehaviour
             .AddPrecondition(beliefs["CanAttackEnemy"])
             //.AddPrecondition(beliefs["CanMoveToAttackPosition"])
             //.AddEffect(beliefs["AttackingPlayer"])
-            //.AddEffect(beliefs["CanAttackEnemy"])
+            .AddEffect(beliefs["Nothing"])
             .Build());
 
         actions.Add(new AgentAction.Builder("FleeFromEnemy")
@@ -286,7 +308,7 @@ public class GoapAgent : MonoBehaviour
 
         goals.Add(new AgentGoal.Builder("AttackEnemyTarget") //Attack: Priority 2
             .WithPriority(3)
-            .WithDesiredEffect(beliefs["CanAttackEnemy"])
+            .WithDesiredEffect(beliefs["Nothing"])
             .Build());
 
 
