@@ -133,6 +133,14 @@ public class PathRequestManager : MonoBehaviour {
         }
         return instance.pathfinding.IsPlaceAvailable(instance.pathfinding.grid.NodeFromWorldPoint(punto), range, punto, revisedNodes);
     }
+
+
+    public static Vector3[] PathBeetweenNodes(Vector3 n1, Vector3 n2)
+    {
+        Vector3[] path = instance.pathfinding.FindDistancePath(n1,n2);
+
+        return path;
+    }
 }
 public struct PathResult {
 	public Vector3[] path;

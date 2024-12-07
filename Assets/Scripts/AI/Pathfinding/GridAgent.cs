@@ -219,8 +219,8 @@ public class Agent : MonoBehaviour
 
     public float DistanceBetweenTwoNodes(Vector3 n1, Vector3 n2)   //DISTANCIA ENTRE DOS NODOS REAL, USANDO RUTAS
     {
-        PathRequestManager.RequestPath(new PathRequest(n1, n2, DistanceOnPathFound));
-
+        Vector3[] path = PathRequestManager.PathBeetweenNodes(n1,n2);
+        /*
         float time = 0;
         while(distancePath == null)
         {
@@ -230,11 +230,12 @@ public class Agent : MonoBehaviour
                 break;
             }
         }
+        */
         float distance = 0f;
         if (distancePath == null) Debug.Log("ME PUTO SUICIDO");
         for (int i = 0; i < distancePath.lookPoints.Length - 1; i++)
         {
-            distance = distance + Vector3.Distance(distancePath.lookPoints[i], distancePath.lookPoints[i + 1]);
+            distance = distance + Vector3.Distance(path[i], path[i + 1]);
         }
         return distance;
     }
