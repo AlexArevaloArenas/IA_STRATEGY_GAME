@@ -22,10 +22,18 @@ public class Unit : MonoBehaviour
 
     public Material invisibleMat;
 
+    public GameObject attackCylinder;
+    public GameObject moveCylinder;
+    
+
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
         viewRange = MoveRange * 3;
+
+        // Set the scale of attackCylinder and moveCylinder
+        attackCylinder.transform.localScale = new Vector3(AttackRange, attackCylinder.transform.localScale.y, AttackRange);
+        moveCylinder.transform.localScale = new Vector3(MoveRange, moveCylinder.transform.localScale.y, MoveRange);
     }
     
     private void Update(){
@@ -65,6 +73,8 @@ public class Unit : MonoBehaviour
     {
         if (pathfindingAgent.IsPlaceAvailable(punto,AttackRange))
         {
+            attackCylinder.SetActive(false);
+            moveCylinder.SetActive(false);
             pathfindingAgent.GoTo(punto);
             GameManager.Instance.EndUnitAction();
         }   

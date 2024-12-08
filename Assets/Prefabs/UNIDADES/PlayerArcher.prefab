@@ -130,6 +130,16 @@ PrefabInstance:
       propertyPath: type
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6116105758803315063, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
+        type: 3}
+      propertyPath: MoveRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6116105758803315063, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
+        type: 3}
+      propertyPath: AttackRange
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8638443172498588240, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
         type: 3}
       propertyPath: m_LocalScale.x

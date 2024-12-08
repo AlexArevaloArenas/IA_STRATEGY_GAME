@@ -35,6 +35,10 @@ public class UnitSelections : MonoBehaviour
 
         unitToAdd.GetComponent<SelectableUnit>().Selected(true);
 
+        //Range
+        unitToAdd.GetComponent<Unit>().attackCylinder.SetActive(true);
+        unitToAdd.GetComponent<Unit>().moveCylinder.SetActive(true);
+
         //Overlay
         //Overlay.Instance.ShowOverlay();
         //Overlay.Instance.AddUnitInfo(unitToAdd.GetComponent<Unit>());
@@ -49,12 +53,20 @@ public class UnitSelections : MonoBehaviour
 
             unitToAdd.GetComponent<SelectableUnit>().Selected(true);
 
+            //Range
+            unitToAdd.GetComponent<Unit>().attackCylinder.SetActive(true);
+            unitToAdd.GetComponent<Unit>().moveCylinder.SetActive(true);
+
 
         }
         else
         {
             unitToAdd.transform.GetChild(0).gameObject.SetActive(false);
+            //Range
+            unitToAdd.GetComponent<Unit>().attackCylinder.SetActive(false);
+            unitToAdd.GetComponent<Unit>().moveCylinder.SetActive(false);
             unitSelected.Remove(unitToAdd);
+
         }
     }
     public void DragSelect(GameObject unitToAdd)
@@ -65,6 +77,10 @@ public class UnitSelections : MonoBehaviour
             unitToAdd.transform.GetChild(0).gameObject.SetActive(true);
             //unitToAdd.GetComponent<UnitMovement>().enabled = true;
             unitToAdd.GetComponent<SelectableUnit>().Selected(true);
+ 
+            //Range
+            unitToAdd.GetComponent<Unit>().attackCylinder.SetActive(true);
+            unitToAdd.GetComponent<Unit>().moveCylinder.SetActive(true);
         }
     }
     public void DeselectAll()
@@ -74,6 +90,9 @@ public class UnitSelections : MonoBehaviour
             //unit.GetComponent<UnitMovement>().enabled = false;
             unit.GetComponent<SelectableUnit>().Selected(false);
             unit.transform.GetChild(0).gameObject.SetActive(false);
+            //Range
+            unit.GetComponent<Unit>().attackCylinder.SetActive(false);
+            unit.GetComponent<Unit>().moveCylinder.SetActive(false);
         }
         unitSelected.Clear();
             //Overlay.Instance.HideOverlay();
