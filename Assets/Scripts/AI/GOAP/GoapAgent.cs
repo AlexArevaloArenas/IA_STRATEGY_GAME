@@ -198,7 +198,7 @@ public class GoapAgent : MonoBehaviour
 
         factory.AddBelief("Nothing", () => false);
 
-        factory.AddBelief("Explore", () => !CanAttackEnemy && enemies.Count >= 0);
+        factory.AddBelief("Explore", () => !CanAttackEnemy && enemies.Count == 0);
 
 
         //No llega el raycast de ataque al enemigo
