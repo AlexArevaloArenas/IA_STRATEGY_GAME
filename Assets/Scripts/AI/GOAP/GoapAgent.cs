@@ -39,7 +39,7 @@ public class GoapAgent : MonoBehaviour
     public bool interacting;
     [SerializeField] Unit currentUnit;
     [SerializeField] Unit enemyUnit;
-    Unit deadUnit;
+    [SerializeField] Unit deadUnit;
 
     List<Unit> allies;
     List<Unit> enemies;
@@ -116,7 +116,7 @@ public class GoapAgent : MonoBehaviour
         enemies = GameManager.Instance.visibleAlivePlayerTeam;
         //allies = GameManager.Instance.enemyTeam;
         //enemies = GameManager.Instance.playerTeam;
-        canResurrect = CanResurrect(allies);
+        canResurrect = CanResurrect(GameManager.Instance.enemyTeam);
         if (!canResurrect)
         {
             enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
@@ -129,7 +129,9 @@ public class GoapAgent : MonoBehaviour
 
         else {
             resurrectedUnit = SelectResurrectType(allies, enemies);
-            currentUnit = SelectCurrentUnit(enemyUnit, GameManager.Instance.enemyTeam); //se selecciona cualquier unidad de la IA (no solo visibles)
+            enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
+            fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
+            currentUnit = SelectCloserUnit(deadUnit, allies); //Unidad mas cercana viva y visible
         } 
 
         ClearGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
@@ -173,6 +175,7 @@ public class GoapAgent : MonoBehaviour
 
         
         bool CanAttackEnemy = false;
+        bool raycastResurrection = false;
 
         if(currentUnit != null){ //TODO ESTO FUNCIONA BIEN
 
@@ -196,13 +199,37 @@ public class GoapAgent : MonoBehaviour
 
         }
 
+        if(canResurrect && currentUnit != null && deadUnit != null){ //TODO ESTO FUNCIONA BIEN
+
+            RaycastHit hit;
+            Debug.DrawRay(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized * currentUnit.AttackRange, Color.blue, 2, false);
+
+            // Define the layer mask
+            LayerMask unitLayerMask = LayerMask.GetMask("UnitEnemy");
+            if (Physics.Raycast(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized, out hit, currentUnit.AttackRange, unitLayerMask)){
+                
+                
+                if (hit.collider.transform.parent.CompareTag("Enemy"))
+                {
+                    raycastResurrection = true;
+                }
+            }
+
+            Debug.Log("Can resurrect an ally: " + raycastResurrection);
+
+            
+
+        }
+
+
+
         factory.AddBelief("Nothing", () => false);
 
         factory.AddBelief("Explore", () => !CanAttackEnemy && enemies.Count == 0);
 
 
         //No llega el raycast de ataque al enemigo
-        factory.AddBelief("CanMoveToEnemy", () => enemies.Count != 0 && enemyUnit != null && currentUnit!= null && !CanAttackEnemy);
+        factory.AddBelief("CanMoveToEnemy", () => !canResurrect && enemies.Count != 0 && enemyUnit != null && currentUnit!= null && !CanAttackEnemy);
 
         //Llega el raycast de ataque al enemigo
         factory.AddBelief("CanAttackEnemy", () => enemyUnit != null && currentUnit != null && CanAttackEnemy);
@@ -211,14 +238,9 @@ public class GoapAgent : MonoBehaviour
         factory.AddBelief("FleeFromEnemy", () => fleeEnemy);
 
         //Resurrection beliefs
-        factory.AddBelief("CanResurrect", () => canResurrect &&
-        Physics.Raycast(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized,
-            currentUnit.AttackRange, LayerMask.NameToLayer("Unit"))
-        );
-        factory.AddBelief("MoveToDeadAlly", () => canResurrect &&
-        !Physics.Raycast(currentUnit.transform.position, (deadUnit.transform.position - currentUnit.transform.position).normalized,
-            currentUnit.AttackRange, LayerMask.NameToLayer("Unit"))
-        );
+        factory.AddBelief("CanResurrect", () => canResurrect && raycastResurrection);
+
+        factory.AddBelief("MoveToDeadAlly", () => canResurrect && !raycastResurrection);
 
 
 
@@ -271,14 +293,14 @@ public class GoapAgent : MonoBehaviour
         actions.Add(new AgentAction.Builder("CanResurrect")
             .WithStrategy(new ResurrectStrategy(currentUnit, deadUnit, resurrectedUnit)) //Instancia el prefab de la unidad que elige la IA
             .AddPrecondition(beliefs["CanResurrect"])
-            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .AddEffect(beliefs["Nothing"])
             .Build());
         
 
         actions.Add(new AgentAction.Builder("MoveToDeadAlly")
             .WithStrategy(new MoveToDeadAllyStrategy(currentUnit, deadUnit))
             .AddPrecondition(beliefs["MoveToDeadAlly"])
-            //.AddEffect(beliefs["CanMoveToEnemy"])
+            .AddEffect(beliefs["Nothing"])
             .Build());
         
 
@@ -291,18 +313,18 @@ public class GoapAgent : MonoBehaviour
 
         goals.Add(new AgentGoal.Builder("FleeFromEnemyTarget") //Flee: Priority 4
            .WithPriority(6)
-           .WithDesiredEffect(beliefs["FleeFromEnemy"])
+           .WithDesiredEffect(beliefs["Nothing"])
            .Build());
 
         goals.Add(new AgentGoal.Builder("MoveToDeadAlly") //Resurrect: Priority 3
             .WithPriority(5)
-            .WithDesiredEffect(beliefs["MoveToDeadAlly"])
+            .WithDesiredEffect(beliefs["Nothing"])
             .Build());
 
 
         goals.Add(new AgentGoal.Builder("CanResurrect")
             .WithPriority(4)
-            .WithDesiredEffect(beliefs["CanResurrect"])
+            .WithDesiredEffect(beliefs["Nothing"])
             .Build());
 
 
@@ -598,6 +620,26 @@ public class GoapAgent : MonoBehaviour
 
     }
 
+    private Unit SelectCloserUnit(Unit deadAlly, List<Unit> allies)
+    {
+        Unit unit = new Unit();
+
+        float minDistance = Mathf.Infinity;
+
+        for(int i = 0; i < allies.Count; i++)
+        {
+            float d = Vector3.Distance(deadAlly.transform.position, allies[i].transform.position);
+            if(d < minDistance)
+            {
+                d = minDistance;
+                unit = allies[i];
+            }
+        }
+
+        return unit;
+
+    }
+
     private Unit SelectMostDangerousUnit(List<Unit> allies, List<Unit> enemies) //Pasar la lista de ENEMIGOS VISIBLES
     {
         
@@ -680,6 +722,13 @@ public class GoapAgent : MonoBehaviour
                 .FirstOrDefault();
         }
 
+        // Ensure the selected unit has more than 0 current health
+        while (selectedUnit != null && selectedUnit.currentHealth <= 0)
+        {
+            //playedUnits.Add(selectedUnit); // Mark the unit as played to avoid selecting it again
+            selectedUnit = allies.FirstOrDefault(u => allies.Contains(u) && u.currentHealth > 0);
+        }
+
         return selectedUnit;
     }
 
@@ -702,7 +751,7 @@ public class GoapAgent : MonoBehaviour
 
         List<Unit> auxiliarList = new List<Unit>();
 
-        if (enemies.Count > allies.Count)  //Jugador tiene mas unidades - Se selecciona counter de lo que mas tenga
+        if (GameManager.Instance.playerTeam.Count > GameManager.Instance.enemyTeam.Count)  //Jugador tiene mas unidades - Se selecciona counter de lo que mas tenga
         { 
             foreach(Unit u in enemies) //Las listas se rellenan con las unidades del jugador
             {
@@ -730,7 +779,7 @@ public class GoapAgent : MonoBehaviour
 
         else //Si es menor o igual, se hace al reves
         {
-            foreach (Unit u in allies) //Las listas se rellenan con las unidades de la IA
+            foreach (Unit u in GameManager.Instance.enemyTeam) //Las listas se rellenan con las unidades de la IA
             {
                 switch (u.type)
                 {

@@ -20,6 +20,8 @@ public class Unit : MonoBehaviour
 
     public string team;
 
+    public Material invisibleMat;
+
     private void Start()
     {
         pathfindingAgent = GetComponent<Agent>();
@@ -29,7 +31,7 @@ public class Unit : MonoBehaviour
     private void Update(){
 
         
-        if(team == "Enemy")
+        if(currentHealth > 0f && team == "Enemy")
         {
             if(GameManager.Instance.visibleAlivePlayerTeam.Count < 5){
 
@@ -45,6 +47,10 @@ public class Unit : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if(currentHealth <= 0){
+            Die();
         }
         
     }
@@ -257,6 +263,7 @@ public class Unit : MonoBehaviour
     public void Revive()
     {
         currentHealth = MaxHealth / 2;
+        /*
         if (team == "Player")
         {
             transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.green;
@@ -265,8 +272,14 @@ public class Unit : MonoBehaviour
         {
             transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.magenta;
         }
+        */
+
+        transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = invisibleMat; //Se vuelve a "desactivar" la capsula
         
-        GetComponent<Unit>().enabled = true;
+
+        GameManager.Instance.TeamCheck();
+
+        //GetComponent<Unit>().enabled = true;
     }
 
     public float GetHealth()
@@ -276,8 +289,13 @@ public class Unit : MonoBehaviour
 
     private void Die()
     {
+        
         transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.grey;
-        GetComponent<Unit>().enabled = false;
+        transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().enabled = true;
+        if (team == "Enemy") GameManager.Instance.PlayerBlood += 1;
+        else GameManager.Instance.AIBlood += 1;
+        //GetComponent<Unit>().enabled = false;
+        
         GameManager.Instance.TeamCheck();
     }
 

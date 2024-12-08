@@ -304,6 +304,7 @@ MonoBehaviour:
   AttackRange: 3
   MoveRange: 3
   team: Player
+  invisibleMat: {fileID: 2100000, guid: 0643e33d6677792459b53841bab5dbbc, type: 2}
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 

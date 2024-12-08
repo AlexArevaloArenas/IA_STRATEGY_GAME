@@ -18,6 +18,11 @@ PrefabInstance:
       propertyPath: type
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 365552655693503404, guid: b1a4201d28dd0db478e8255380e42578,
+        type: 3}
+      propertyPath: AttackRange
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 636067658625099099, guid: b1a4201d28dd0db478e8255380e42578,
         type: 3}
       propertyPath: m_LocalScale.x

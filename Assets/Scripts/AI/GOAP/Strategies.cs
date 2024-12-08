@@ -132,11 +132,9 @@ public class MoveToEnemyStrategy : IActionStrategy
                 
                 for (int i = 0; i < bestSafePlaces.Length; i++)
                 {
-                    if (agent == null) Debug.Log("AGENTE HIJO PUTA");
-                    if (bestSafePlaces[i].worldPosition == null) Debug.Log("SAFE PLACE HIJO PUTA");
-                    if (targetEnemy == null) Debug.Log("TARGET HIJO PUTA");
+                    
                     float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
-                    Debug.Log("DISTANCIA: " + distance);
+
                     if (distance < minDistance)
                     {
                         minDistance = distance;
@@ -302,10 +300,31 @@ public class ResurrectStrategy : IActionStrategy
 
     public void Start()
     {
-        GameObject.Instantiate(currentUnit, deadAlly.transform.position, Quaternion.identity); //Se instancia la nueva unidad
-        GameManager.Instance.enemyTeam.Add(prefab.GetComponent<Unit>()); //Se agrega la nueva unidad a la lista de enemigos
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
+        //GameObject.Instantiate(currentUnit, deadAlly.transform.position, Quaternion.identity); //Se instancia la nueva unidad
+        //GameManager.Instance.enemyTeam.Add(prefab.GetComponent<Unit>()); //Se agrega la nueva unidad a la lista de enemigos
+        deadAlly.Revive();
         GameManager.Instance.AIBlood -= 1;
+        Agent agent = currentUnit.GetComponent<Agent>();
+        agent.StartCoroutine(WaitUntilReached());
+
+    }
+
+    private System.Collections.IEnumerator WaitUntilReached()
+    {
+
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
+
         complete = true;
+        Debug.Log("HA RESUCITADO");
+        GameManager.Instance.unitsUsed += 1;
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
 
     }
 
@@ -329,6 +348,8 @@ public class MoveToDeadAllyStrategy : IActionStrategy
 
     public void Start()
     {
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
+        Debug.Log("JOER QUIERO RESUCITAR TIO");
         // First step: Find nearby enemies
         Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
 
@@ -337,26 +358,55 @@ public class MoveToDeadAllyStrategy : IActionStrategy
         // Second step: Find the best safe places considering all nearby enemies
         GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
 
+        Agent agent = currentUnit.GetComponent<Agent>();
+
         if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
         {
-            float maxDistance = 0f;
+            float recordDistance = Mathf.Infinity;
             int count = 0;
-
+            
             for (int i = 0; i < bestSafePlaces.Length; i++)
             {
-                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, deadAlly.transform.position);
-                if (distance > maxDistance)
+                
+                float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, deadAlly.transform.position);
+                //Debug.Log("DISTANCIA: " + distance);
+                if (distance < recordDistance)
                 {
-                    maxDistance = distance;
+                    recordDistance = distance;
                     count = i;
 
                 }
+        
             }
 
-            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+
+            Vector3 targetPosition = bestSafePlaces[count].worldPosition;
+            agent.GoTo(targetPosition);
+
+            //currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+            agent.StartCoroutine(WaitUntilReached());
 
         }
+
+        
+    }
+
+    private System.Collections.IEnumerator WaitUntilReached()
+    {
+
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
+
         complete = true;
+        Debug.Log("SE MUEVE HACIA RESUCITADO");
+        GameManager.Instance.unitsUsed += 1;
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
+
     }
 
 
@@ -381,6 +431,7 @@ public class FleeFromEnemyStrategy : IActionStrategy
 
     public void Start()
     {
+        GameManager.Instance.GoapAgent.interacting = true; //Asi no se calculan mas goals mientras se juega
         // First step: Find nearby enemies
         Unit[] nearbyEnemies = currentUnit.GetComponent<Agent>().EnemiesAvailable();
 
@@ -388,15 +439,17 @@ public class FleeFromEnemyStrategy : IActionStrategy
 
         // Second step: Find the best safe places considering all nearby enemies
         GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+        Agent agent = currentUnit.GetComponent<Agent>();
 
-        if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
+        if (bestSafePlaces.Length > 0) //moves to the safest place farest to the target enemy (flees from him)
         {
-            float maxDistance = 0f;
+            float maxDistance = 0;
             int count = 0;
-
+            
             for (int i = 0; i < bestSafePlaces.Length; i++)
             {
-                float distance = Vector3.Distance(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+                float distance = agent.DistanceBetweenTwoNodes(bestSafePlaces[i].worldPosition, targetEnemy.transform.position);
+
                 if (distance > maxDistance)
                 {
                     maxDistance = distance;
@@ -405,10 +458,31 @@ public class FleeFromEnemyStrategy : IActionStrategy
                 }
             }
 
-            currentUnit.GetComponent<Agent>().GoTo(bestSafePlaces[count].worldPosition);
+            Vector3 targetPosition = bestSafePlaces[count].worldPosition;
+
+            agent.GoTo(targetPosition);
+            agent.StartCoroutine(WaitUntilReached());
+
 
         }
+    }
+
+    private System.Collections.IEnumerator WaitUntilReached()
+    {
+
+        yield return new WaitForSeconds(1.5f); //Delay timer between moves
+
         complete = true;
+        Debug.Log("HUYENDO");
+        GameManager.Instance.unitsUsed += 1;
+        if (GameManager.Instance.unitsUsed >= GameManager.Instance.unitsPerTurn)
+        {
+            GameManager.Instance.EndAITurn();
+        }
+        else GameManager.Instance.GoapAgent.TurnStart();
+
+
+
     }
 
 

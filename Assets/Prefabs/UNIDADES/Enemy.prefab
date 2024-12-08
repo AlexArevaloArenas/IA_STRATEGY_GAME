@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3364667174868928724}
   m_Layer: 10
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -84,11 +84,12 @@ MonoBehaviour:
   type: 3
   viewRange: 9
   MaxHealth: 5
-  currentHealth: 0
+  currentHealth: 5
   AttackDamage: 5
-  AttackRange: 2
+  AttackRange: 3
   MoveRange: 3
   team: Enemy
+  invisibleMat: {fileID: 2100000, guid: 0643e33d6677792459b53841bab5dbbc, type: 2}
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 
