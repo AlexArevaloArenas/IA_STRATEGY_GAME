@@ -124,6 +124,21 @@ public class MoveToEnemyStrategy : IActionStrategy
         {
             // Second step: Find the best safe places considering all nearby enemies
             GridNode[] bestSafePlaces = currentUnit.GetComponent<Agent>().FindSafePlaces(nearbyEnemies.ToList());
+            List<GridNode> safestHeightsPlaces = new List<GridNode>();
+
+            foreach (GridNode n in bestSafePlaces)
+            {
+                if (n.worldPosition.y > 0)
+                {
+                    safestHeightsPlaces.Add(n);
+
+                }
+            }
+
+            if (safestHeightsPlaces.Count!=0)
+            {
+                bestSafePlaces = safestHeightsPlaces.ToArray();
+            }
 
             if (bestSafePlaces.Length > 0) //moves to the safest place closer to the target enemy
             {
