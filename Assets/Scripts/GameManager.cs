@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour {
     public int unitsPerTurn;
     public int unitsUsed;
     int teamSize;
+    int killCount;
 
     public int PlayerBlood = 0;
     public int AIBlood = 0;
@@ -88,13 +89,15 @@ public class GameManager : MonoBehaviour {
     }
 
     void runGame() {
-        if (playerTeam.Count == 0){
+        if (acabado && victory == false){
+            Debug.Log("Jugador es un manco");
             //Jugador Pierde
             Time.timeScale = 0;
             //Mostrar cosas del canvas
         }
         
-        else if (enemyTeam.Count == 0){
+        else if (acabado && victory){
+            Debug.Log("buena tío");
             //Jugador Gana
             Time.timeScale = 0;
             //Mostrar cosas del canvas
@@ -215,6 +218,7 @@ public class GameManager : MonoBehaviour {
 
     public void TeamCheck()
     {
+        killCount = 0;
         visibleAlivePlayerTeam.Clear();
         visibleAliveEnemyTeam.Clear();
         //&& u.visible
@@ -223,13 +227,22 @@ public class GameManager : MonoBehaviour {
             {
                 visibleAlivePlayerTeam.Add(u);
             } 
+            if (u.currentHealth<0) killCount++;
         }
+        if (killCount >= playerTeam.Count) acabado = true;
+         
         foreach (Unit u in enemyTeam) {
-            if (u.currentHealth > 0 && u.visible)
+            if (u.currentHealth > 0)
             {
                 visibleAliveEnemyTeam.Add(u);
             }            
         }
+        if (visibleAliveEnemyTeam.Count <= 0){
+            victory = true;
+            acabado = true;
+        }
+
+        
     }
 
     public void EndAITurn()
