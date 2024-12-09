@@ -90,6 +90,8 @@ MonoBehaviour:
   MoveRange: 3
   team: Enemy
   invisibleMat: {fileID: 2100000, guid: 0643e33d6677792459b53841bab5dbbc, type: 2}
+  attackCylinder: {fileID: 0}
+  moveCylinder: {fileID: 0}
   hpBar: {fileID: 0}
   picture: {fileID: 0}
   unitName: 
@@ -297,7 +299,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: d314b83e0f26de0439ca77f0e9c74715, type: 3}
   m_Color: {r: 1, g: 0, b: 0.5379276, a: 1}
   m_FlipX: 0
