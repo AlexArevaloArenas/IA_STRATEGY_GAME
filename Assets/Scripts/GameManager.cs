@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour {
     public int unitsPerTurn;
     public int unitsUsed;
     int teamSize;
-    int killCount;
+    public int killCount;
 
     public int PlayerBlood = 0;
     public int AIBlood = 0;
@@ -92,6 +92,7 @@ public class GameManager : MonoBehaviour {
         if (acabado && victory == false){
             Debug.Log("Jugador es un manco");
             //Jugador Pierde
+            canvasPrefab.GetComponent<Menu>().YouDied();
             Time.timeScale = 0;
             //Mostrar cosas del canvas
         }
@@ -99,6 +100,7 @@ public class GameManager : MonoBehaviour {
         else if (acabado && victory){
             Debug.Log("buena tío");
             //Jugador Gana
+            canvasPrefab.GetComponent<Menu>().YouWin();
             Time.timeScale = 0;
             //Mostrar cosas del canvas
         }
@@ -227,7 +229,7 @@ public class GameManager : MonoBehaviour {
             {
                 visibleAlivePlayerTeam.Add(u);
             } 
-            if (u.currentHealth<0) killCount++;
+            if (u.currentHealth<=0) killCount++;
         }
         if (killCount >= playerTeam.Count) acabado = true;
          

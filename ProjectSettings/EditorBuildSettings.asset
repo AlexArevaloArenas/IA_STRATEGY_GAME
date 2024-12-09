@@ -12,6 +12,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 22fa1c405ce54634381c7e6a931ff491
   - enabled: 1
-    path: Assets/Scenes/Jojescena.unity
-    guid: b2354b5c36c08f64897ffded02e45dd0
+    path: Assets/Scenes/JuegoVictor.unity
+    guid: 9d0cd922703987e4c8d583a62337c409
+  - enabled: 1
+    path: Assets/Scenes/Defeat.unity
+    guid: 217ba56b4a6258847a1fc75b5f2fe51a
+  - enabled: 1
+    path: Assets/Scenes/Victory.unity
+    guid: 33d27653d23572544a55d2465663b91b
   m_configObjects: {}

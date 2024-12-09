@@ -218,6 +218,11 @@ PrefabInstance:
       propertyPath: type
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8631956785741611803, guid: 3bfbf17c589bd9749b88d0e65de2add4,
+        type: 3}
+      propertyPath: MoveRange
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2918749847769257167, guid: 3bfbf17c589bd9749b88d0e65de2add4, type: 3}
     - {fileID: 4846620092337114007, guid: 3bfbf17c589bd9749b88d0e65de2add4, type: 3}
