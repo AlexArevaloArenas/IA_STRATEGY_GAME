@@ -793,7 +793,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Sangre: '
+  m_text: 'Sangre: 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5532,6 +5532,11 @@ PrefabInstance:
       propertyPath: canvasPrefab
       value: 
       objectReference: {fileID: 864572907}
+    - target: {fileID: 7685293472715535313, guid: d1de1c31c3087f84fbd7696d5cf4a52e,
+        type: 3}
+      propertyPath: sangreCanvas
+      value: 
+      objectReference: {fileID: 283708537}
     - target: {fileID: 7685293472715535313, guid: d1de1c31c3087f84fbd7696d5cf4a52e,
         type: 3}
       propertyPath: spawnerEnemy
