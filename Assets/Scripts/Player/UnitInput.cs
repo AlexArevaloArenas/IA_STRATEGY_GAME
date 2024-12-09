@@ -59,11 +59,15 @@ public class UnitInput : MonoBehaviour
 
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Unit"))
                 {
-                    Debug.Log(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team);
+                    
                     if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().currentHealth <= 0 && GameManager.Instance.PlayerBlood>0)
                     {
-                        //GameManager.Instance.PlayerBlood = GameManager.Instance.PlayerBlood - 1;
-                        selections.unitSelected[0].GetComponent<Unit>().Revive();
+                        Debug.Log(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team);
+                        GameManager.Instance.PlayerBlood = GameManager.Instance.PlayerBlood - 1;
+                        hit.collider.gameObject.transform.parent.GetComponent<Unit>().currentHealth = selections.unitSelected[0].GetComponent<Unit>().MaxHealth;
+                        hit.collider.gameObject.transform.parent.transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
+                        GameManager.Instance.TeamCheck();
+                        GameManager.Instance.EndUnitAction();
                     }
                     
                 }

@@ -275,7 +275,14 @@ public class Unit : MonoBehaviour
 
     public void Revive()
     {
-        currentHealth = 5;
+
+        if (GameManager.Instance.AIBlood>0)
+        {
+            return;
+        }
+
+
+        currentHealth = MaxHealth;
         /*
         if (team == "Player")
         {
@@ -287,18 +294,12 @@ public class Unit : MonoBehaviour
         }
         */
         Debug.Log("Revivo!");
-        transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = invisibleMat; //Se vuelve a "desactivar" la capsula
+        //transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = invisibleMat; //Se vuelve a "desactivar" la capsula
 
-        if (team == "Enemy") {
-            GameManager.Instance.AIBlood -= 1;
-            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255,0,137);
-        }
-        else {
-            GameManager.Instance.PlayerBlood -= 1;
-            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255,255,255);
-        }
+        GameManager.Instance.AIBlood -= 1;
+        transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255, 0, 137);
         GameManager.Instance.TeamCheck();
-
+        GameManager.Instance.EndUnitAction();
         //GetComponent<Unit>().enabled = true;
     }
 
@@ -316,7 +317,7 @@ public class Unit : MonoBehaviour
             GameManager.Instance.PlayerBlood += 1;
             transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,0);
         }
-        else{
+        else if(team == "Player") {
             GameManager.Instance.AIBlood += 1;
             transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,5);
 
