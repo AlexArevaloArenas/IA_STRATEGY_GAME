@@ -289,8 +289,14 @@ public class Unit : MonoBehaviour
         Debug.Log("Revivo!");
         transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = invisibleMat; //Se vuelve a "desactivar" la capsula
 
-        if (team == "Enemy") GameManager.Instance.AIBlood -= 1;
-        else GameManager.Instance.PlayerBlood -= 1;
+        if (team == "Enemy") {
+            GameManager.Instance.AIBlood -= 1;
+            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255,0,137);
+        }
+        else {
+            GameManager.Instance.PlayerBlood -= 1;
+            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(255,255,255);
+        }
         GameManager.Instance.TeamCheck();
 
         //GetComponent<Unit>().enabled = true;
@@ -304,10 +310,17 @@ public class Unit : MonoBehaviour
     private void Die()
     {
         
-        transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.grey;
-        transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().enabled = true;
-        if (team == "Enemy") GameManager.Instance.PlayerBlood += 1;
-        else GameManager.Instance.AIBlood += 1;
+        //transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.grey;
+        //transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().enabled = true;
+        if (team == "Enemy") {
+            GameManager.Instance.PlayerBlood += 1;
+            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,0);
+        }
+        else{
+            GameManager.Instance.AIBlood += 1;
+            transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,5);
+
+        } 
         //GetComponent<Unit>().enabled = false;
         
         GameManager.Instance.TeamCheck();

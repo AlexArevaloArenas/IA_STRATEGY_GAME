@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour {
     public GameObject spawnerPlayer;
     public GameObject spawnerEnemy;
     public GameObject[] availableUnits;
+    public GameObject HealthbarPrefab;
 
     int state = 0;
     public List<Unit> playerTeam;
@@ -15,6 +16,9 @@ public class GameManager : MonoBehaviour {
 
     public List<Unit> visibleAlivePlayerTeam;
     public List<Unit> visibleAliveEnemyTeam;
+
+    public List<GameObject> listaHealthbars;
+
 
     public bool acabado = false;
     bool victory = false;
@@ -31,6 +35,7 @@ public class GameManager : MonoBehaviour {
     public GoapAgent GoapAgent;
 
     public GameObject canvasPrefab;
+    public GameObject canvasHealthbarPrefab;
     public csFogWar fogWar = null;
     public static GameManager Instance { get; private set; }
     void Awake()
@@ -183,12 +188,15 @@ public class GameManager : MonoBehaviour {
             GameObject unit1 = availableUnits[Random.Range(0, 4)];
             GameObject punit = Instantiate(unit1, spawnerPlayer.transform.GetChild(i).transform.position, Quaternion.identity);
             playerTeam.Add(punit.GetComponent<Unit>());
+            CreaBarra(punit.GetComponent<Unit>());
         }
         for (int i = 0; i < 5; i++)
         {
             GameObject unit2 = availableUnits[Random.Range(4, 8)];
             GameObject eunit = Instantiate(unit2, spawnerEnemy.transform.GetChild(i).transform.position, Quaternion.identity);
             enemyTeam.Add(eunit.GetComponent<Unit>());
+            CreaBarra(eunit.GetComponent<Unit>());
+
         }
         
         foreach (Unit u in playerTeam)
@@ -252,6 +260,13 @@ public class GameManager : MonoBehaviour {
         isPlayerTurn=true;
         isEnemyTurn=false;
         unitsUsed = 0;
+    }
+
+    public void CreaBarra(Unit ud){
+        Vector3 r = new Vector3(40,0,0);
+        GameObject h = Instantiate(HealthbarPrefab, ud.transform.position, Quaternion.Euler(r),canvasHealthbarPrefab .transform);
+        h.GetComponent<Healthbar>().unidad = ud;
+        listaHealthbars.Add(h);
     }
 
 }
