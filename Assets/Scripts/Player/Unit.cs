@@ -57,9 +57,7 @@ public class Unit : MonoBehaviour
             }
         }
 
-        if(currentHealth <= 0){
-            Die();
-        }
+        
         
     }
 
@@ -71,7 +69,7 @@ public class Unit : MonoBehaviour
 
     public void Move(Vector3 punto)
     {
-        if (pathfindingAgent.IsPlaceAvailable(punto,AttackRange))
+        if (pathfindingAgent.IsPlaceAvailable(punto,AttackRange) && pathfindingAgent.DistanceBetweenTwoNodes(transform.position, punto)<MoveRange)
         {
             attackCylinder.SetActive(false);
             moveCylinder.SetActive(false);
@@ -164,7 +162,10 @@ public class Unit : MonoBehaviour
                 break;
 
         }
-
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
 
     public void Attack(Unit enemy)
@@ -256,8 +257,10 @@ public class Unit : MonoBehaviour
                     break;
 
             }
+            
             GameManager.Instance.TeamCheck();
             GameManager.Instance.EndUnitAction();
+
         }
     }
 
@@ -265,14 +268,14 @@ public class Unit : MonoBehaviour
     {
         Debug.Log("Me atacan!!");
         currentHealth -= damage;
-        if (currentHealth < 0) {
+        if (currentHealth <= 0) {
             Die();
         }
     }
 
     public void Revive()
     {
-        currentHealth = MaxHealth / 2;
+        currentHealth = 5;
         /*
         if (team == "Player")
         {
@@ -283,10 +286,11 @@ public class Unit : MonoBehaviour
             transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.magenta;
         }
         */
-
+        Debug.Log("Revivo!");
         transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().material = invisibleMat; //Se vuelve a "desactivar" la capsula
-        
 
+        if (team == "Enemy") GameManager.Instance.AIBlood -= 1;
+        else GameManager.Instance.PlayerBlood -= 1;
         GameManager.Instance.TeamCheck();
 
         //GetComponent<Unit>().enabled = true;

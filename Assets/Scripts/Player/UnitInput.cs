@@ -40,7 +40,7 @@ public class UnitInput : MonoBehaviour
 
         */
 
-        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count >0 && GameManager.Instance.isPlayerTurn==true) // When released
+        if (Input.GetMouseButtonUp(1) && selections.unitSelected.Count >0 && selections.unitSelected[0].GetComponent<Unit>().currentHealth>0 && GameManager.Instance.isPlayerTurn==true) // When released
         {
             //Debug.Log("Pepe Viyuela");
             RaycastHit hit;
@@ -60,18 +60,17 @@ public class UnitInput : MonoBehaviour
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Unit"))
                 {
                     Debug.Log(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team);
-                    if (hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Enemy")
+                    if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().currentHealth <= 0 && GameManager.Instance.PlayerBlood>0)
                     {
-                        Debug.Log("Pepe Atacuela");
-                        selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.transform.parent.GetComponent<Unit>());
-                        
-                    }
-                    else if(hit.collider.gameObject.transform.parent.GetComponent<Unit>().team == "Player" && GameManager.Instance.PlayerBlood>0)
-                    {
-                        GameManager.Instance.PlayerBlood = GameManager.Instance.PlayerBlood - 1;
+                        //GameManager.Instance.PlayerBlood = GameManager.Instance.PlayerBlood - 1;
                         selections.unitSelected[0].GetComponent<Unit>().Revive();
                     }
                     
+                }
+                else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("UnitEnemy") && hit.collider.gameObject.transform.parent.GetComponent<Unit>().currentHealth > 0)
+                {
+                    Debug.Log("Pepe Atacuela");
+                    selections.unitSelected[0].GetComponent<Unit>().Attack(hit.collider.gameObject.transform.parent.GetComponent<Unit>());
                 }
             }
             
