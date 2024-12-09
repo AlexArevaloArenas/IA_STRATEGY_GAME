@@ -3820,7 +3820,7 @@ PrefabInstance:
     - target: {fileID: 7685293472715535313, guid: d1de1c31c3087f84fbd7696d5cf4a52e,
         type: 3}
       propertyPath: AIBlood
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7685293472715535313, guid: d1de1c31c3087f84fbd7696d5cf4a52e,
         type: 3}
