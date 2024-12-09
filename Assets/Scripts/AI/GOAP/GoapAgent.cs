@@ -44,9 +44,10 @@ public class GoapAgent : MonoBehaviour
     List<Unit> allies;
     List<Unit> enemies;
 
-    List<Unit> playedUnits;
+    public List<Unit> playedUnits;
 
     bool fleeEnemy;
+    bool CanAttackEnemy;
 
     //Mecanica resureccion
     bool canResurrect;
@@ -117,6 +118,7 @@ public class GoapAgent : MonoBehaviour
         //allies = GameManager.Instance.enemyTeam;
         //enemies = GameManager.Instance.playerTeam;
         canResurrect = CanResurrect(GameManager.Instance.enemyTeam);
+        CanAttackEnemy = false;
         if (!canResurrect)
         {
             enemyUnit = SelectMostDangerousUnit(allies, enemies); //Se tiene en cuenta solo las unidades visibles
@@ -133,6 +135,31 @@ public class GoapAgent : MonoBehaviour
             fleeEnemy = FleeFromEnemy(currentUnit, enemyUnit);
             currentUnit = SelectCloserUnit(deadUnit, allies); //Unidad mas cercana viva y visible
         } 
+
+        if(currentUnit != null){ //TODO ESTO FUNCIONA BIEN
+
+            RaycastHit hit;
+            Debug.DrawRay(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized * currentUnit.AttackRange, Color.red, 2, false);
+
+            // Define the layer mask
+            LayerMask unitLayerMask = LayerMask.GetMask("Unit");
+            if (Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, out hit, currentUnit.AttackRange, unitLayerMask)){
+                
+                
+                if (hit.collider.transform.parent.CompareTag("Player"))
+                {
+                    CanAttackEnemy = true;
+                }
+            }
+
+            Debug.Log("Can attack enemy: " + CanAttackEnemy);
+
+            
+
+        }
+
+
+
 
         ClearGOAP(); //Preferiblemente llamar a esta funcion cuando se acaba el turno de la IA
         SetupGOAP();
@@ -174,30 +201,8 @@ public class GoapAgent : MonoBehaviour
         
 
         
-        bool CanAttackEnemy = false;
+        
         bool raycastResurrection = false;
-
-        if(currentUnit != null){ //TODO ESTO FUNCIONA BIEN
-
-            RaycastHit hit;
-            Debug.DrawRay(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized * currentUnit.AttackRange, Color.red, 2, false);
-
-            // Define the layer mask
-            LayerMask unitLayerMask = LayerMask.GetMask("Unit");
-            if (Physics.Raycast(currentUnit.transform.position, (enemyUnit.transform.position - currentUnit.transform.position).normalized, out hit, currentUnit.AttackRange, unitLayerMask)){
-                
-                
-                if (hit.collider.transform.parent.CompareTag("Player"))
-                {
-                    CanAttackEnemy = true;
-                }
-            }
-
-            Debug.Log("Can attack enemy: " + CanAttackEnemy);
-
-            
-
-        }
 
         if(canResurrect && currentUnit != null && deadUnit != null){ //TODO ESTO FUNCIONA BIEN
 
@@ -709,7 +714,7 @@ public class GoapAgent : MonoBehaviour
         if (selectedUnit == null)
         {
             selectedUnit = allies
-                .Where(u => u.type == UnitType.Pawn)
+                .Where(u => u.type == UnitType.Pawn && !playedUnits.Contains(u))
                 .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
                 .FirstOrDefault();
         }
@@ -719,20 +724,20 @@ public class GoapAgent : MonoBehaviour
         {
             selectedUnit = allies
                 .OrderBy(u => Vector3.Distance(u.transform.position, currentEnemy.transform.position))
-                .FirstOrDefault();
+                .FirstOrDefault(u => !playedUnits.Contains(u));
         }
 
         // Ensure the selected unit has more than 0 current health
         while (selectedUnit != null && selectedUnit.currentHealth <= 0)
         {
             //playedUnits.Add(selectedUnit); // Mark the unit as played to avoid selecting it again
-            selectedUnit = allies.FirstOrDefault(u => allies.Contains(u) && u.currentHealth > 0);
+            selectedUnit = allies.FirstOrDefault(u => allies.Contains(u) && !playedUnits.Contains(u) && u.currentHealth > 0);
         }
 
         int p = Random.Range(0, 10);
-        if(p < 7 && selectedUnit != null) //30% chance to not adding to played
+        if(!CanAttackEnemy && allies.Count > 1 && selectedUnit != null) //30% chance to not adding to played
         {
-            playedUnits.Add(selectedUnit);
+            if(p < 7) playedUnits.Add(selectedUnit);
             
         }
 

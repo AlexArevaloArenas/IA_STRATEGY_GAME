@@ -260,6 +260,7 @@ public class GameManager : MonoBehaviour {
         isPlayerTurn=true;
         isEnemyTurn=false;
         unitsUsed = 0;
+        GoapAgent.playedUnits.Clear();
     }
 
     public void CreaBarra(Unit ud){
