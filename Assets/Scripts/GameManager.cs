@@ -2,6 +2,7 @@ using FischlWorks_FogWar;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour {
 
@@ -18,6 +19,7 @@ public class GameManager : MonoBehaviour {
     public List<Unit> visibleAliveEnemyTeam;
 
     public List<GameObject> listaHealthbars;
+    public TMP_Text sangreCanvas;
 
 
     public bool acabado = false;
@@ -214,6 +216,8 @@ public class GameManager : MonoBehaviour {
             //Debug.Log(":((((((((((((((");
         }
         TeamCheck();
+        
+
     }    
 
     public void EndUnitAction()

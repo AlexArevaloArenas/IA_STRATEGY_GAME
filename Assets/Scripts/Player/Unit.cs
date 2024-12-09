@@ -311,10 +311,12 @@ public class Unit : MonoBehaviour
         //transform.GetChild(1).gameObject.GetComponent<MeshRenderer>().enabled = true;
         if (team == "Enemy") {
             GameManager.Instance.PlayerBlood += 1;
+            GameManager.Instance.sangreCanvas.text ="Sangre: " + GameManager.Instance.PlayerBlood;
             transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,0);
         }
         else if(team == "Player") {
             GameManager.Instance.AIBlood += 1;
+            
             transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0,0,5);
 
         } 
