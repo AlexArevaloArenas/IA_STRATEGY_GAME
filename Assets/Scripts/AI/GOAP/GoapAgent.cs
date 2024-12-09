@@ -44,7 +44,7 @@ public class GoapAgent : MonoBehaviour
     List<Unit> allies;
     List<Unit> enemies;
 
-    //List<Unit> playedUnits;
+    List<Unit> playedUnits;
 
     bool fleeEnemy;
 
@@ -91,7 +91,7 @@ public class GoapAgent : MonoBehaviour
     {
         allies = GameManager.Instance.visibleAliveEnemyTeam;
         enemies = GameManager.Instance.visibleAlivePlayerTeam;
-        //playedUnits = new List<Unit>();
+        playedUnits = new List<Unit>();
         SetupGOAP();
         AITurn = false;
         
@@ -687,19 +687,19 @@ public class GoapAgent : MonoBehaviour
         switch(currentEnemy.type)
         {
             case UnitType.Archer:
-                strongestUnits = allies.Where(u => u.type == UnitType.Knight).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Knight && !playedUnits.Contains(u)).ToList();
                 break;
 
             case UnitType.Mage:
-                strongestUnits = allies.Where(u => u.type == UnitType.Archer).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Archer && !playedUnits.Contains(u)).ToList();
                 break;
 
             case UnitType.Knight:
-                strongestUnits = allies.Where(u => u.type == UnitType.Mage).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Mage && !playedUnits.Contains(u)).ToList();
                 break;
 
             default:
-                strongestUnits = allies.Where(u => u.type == UnitType.Pawn).ToList();
+                strongestUnits = allies.Where(u => u.type == UnitType.Pawn && !playedUnits.Contains(u)).ToList();
                 break;
         }
 
@@ -727,6 +727,13 @@ public class GoapAgent : MonoBehaviour
         {
             //playedUnits.Add(selectedUnit); // Mark the unit as played to avoid selecting it again
             selectedUnit = allies.FirstOrDefault(u => allies.Contains(u) && u.currentHealth > 0);
+        }
+
+        int p = Random.Range(0, 10);
+        if(p < 7 && selectedUnit != null) //30% chance to not adding to played
+        {
+            playedUnits.Add(selectedUnit);
+            
         }
 
         return selectedUnit;
