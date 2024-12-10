@@ -15,15 +15,16 @@ public class GridNode : IHeapItem<GridNode> {
 	int heapIndex;
 
 	public bool elevator;
-	
-	public GridNode(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY, int _penalty) {
+    public bool slowMask;
+
+    public GridNode(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY, int _penalty) {
 		walkable = _walkable;
 		worldPosition = _worldPos;
 		gridX = _gridX;
 		gridY = _gridY;
 		movementPenalty = _penalty;
 		elevator = false;
-
+		slowMask = false;
     }
 
 	public int fCost {

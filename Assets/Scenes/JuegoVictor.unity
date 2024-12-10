@@ -291,6 +291,9 @@ MonoBehaviour:
   elevatorMask:
     serializedVersion: 2
     m_Bits: 128
+  slowMask:
+    serializedVersion: 2
+    m_Bits: 2048
   gridWorldSize: {x: 40, y: 40}
   nodeRadius: 0.2
   walkableRegions:

@@ -8,6 +8,7 @@ public class Grid : MonoBehaviour {
 	public bool displayGridGizmos;
 	public LayerMask unwalkableMask;
     public LayerMask elevatorMask;
+    public LayerMask slowMask;
     public Vector2 gridWorldSize;
 	public float nodeRadius;
 	public TerrainType[] walkableRegions;
@@ -66,6 +67,8 @@ public class Grid : MonoBehaviour {
                 Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
 				RaycastHit hit;
 				bool elevator = false;
+                bool slow = false;
+
 
                 if (Physics.Raycast(ray,out hit, 100, walkableMask)) {
 
@@ -90,8 +93,18 @@ public class Grid : MonoBehaviour {
 
                 }
 
+                if (Physics.CheckSphere(worldPoint, nodeRadius, slowMask))
+                {
+                    slow = true;
+					worldPoint.y = 0;
+                    //Debug.Log(elevator);
+
+                }
+
                 grid[x,y] = new GridNode(walkable,worldPoint, x,y, movementPenalty);
                 grid[x, y].elevator = elevator;
+                grid[x, y].slowMask = slow;
+                //Debug.Log(grid[x, y].worldPosition.y);
 
             }
 		}
@@ -170,7 +183,7 @@ public class Grid : MonoBehaviour {
 
                     foreach (GridNode node in GetNeighbours(grid[x, y]))
                     {
-                        if (height > node.worldPosition.y)
+                        if (height > node.worldPosition.y && !grid[x, y].slowMask)
                         {
                             grid[x, y].walkable = false;
 
