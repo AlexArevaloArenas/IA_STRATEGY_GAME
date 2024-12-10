@@ -1,3 +1,4 @@
+using FischlWorks_FogWar;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,9 +19,31 @@ public class Healthbar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        nuevaPos = new Vector3(unidad.transform.position.x, unidad.transform.position.y+margen.x, unidad.transform.position.z+margen.y);
-        transform.position = nuevaPos;
-        barraVerde.GetComponent<Image>().fillAmount = CalculaFill(unidad);
+
+        if (unidad.team == "Enemy")
+        {
+            if (unidad.GetComponent<csFogVisibilityAgent>().GetVisibility())
+            {
+                nuevaPos = new Vector3(unidad.transform.position.x, unidad.transform.position.y + margen.x, unidad.transform.position.z + margen.y);
+                transform.position = nuevaPos;
+                barraVerde.GetComponent<Image>().fillAmount = CalculaFill(unidad);
+            }
+            else
+            {
+                nuevaPos = new Vector3(-1000, -1000, -1000);
+                transform.position = nuevaPos;
+                barraVerde.GetComponent<Image>().fillAmount = CalculaFill(unidad);
+
+
+            }
+        }
+        else
+        {
+            nuevaPos = new Vector3(unidad.transform.position.x, unidad.transform.position.y + margen.x, unidad.transform.position.z + margen.y);
+            transform.position = nuevaPos;
+            barraVerde.GetComponent<Image>().fillAmount = CalculaFill(unidad);
+        }
+        
     }
 
     float CalculaFill(Unit u){

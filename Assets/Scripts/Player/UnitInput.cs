@@ -50,7 +50,7 @@ public class UnitInput : MonoBehaviour
             {
                 //Debug.Log(hit.collider.gameObject);
                 //Debug.Log("Pepe Castañuela 1");
-                if (hit.collider.gameObject.layer== LayerMask.NameToLayer("Ground"))
+                if (hit.collider.gameObject.layer== LayerMask.NameToLayer("Ground")|| hit.collider.gameObject.layer == LayerMask.NameToLayer("La que tú quieras"))
                 {
                     //Debug.Log("Pepe Castañuela 2");
                     selections.unitSelected[0].GetComponent<Unit>().Move(new Vector3(hit.point.x, hit.point.y, hit.point.z));

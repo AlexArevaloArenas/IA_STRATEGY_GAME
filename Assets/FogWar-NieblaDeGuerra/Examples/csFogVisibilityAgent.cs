@@ -45,7 +45,10 @@ namespace FischlWorks_FogWar
         private List<MeshRenderer> meshRenderers = null;
         private List<SkinnedMeshRenderer> skinnedMeshRenderers = null;
 
-
+        public bool GetVisibility()
+        {
+            return visibility;
+        }
 
         private void Start()
         {
@@ -85,6 +88,16 @@ namespace FischlWorks_FogWar
             foreach (SkinnedMeshRenderer renderer in skinnedMeshRenderers)
             {
                 renderer.enabled = visibility;
+            }
+
+
+            if (visibility == false)
+            {
+                transform.GetChild(2).gameObject.SetActive(false);
+            }
+            else
+            {
+                transform.GetChild(2).gameObject.SetActive(true);
             }
         }
 

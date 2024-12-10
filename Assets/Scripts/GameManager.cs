@@ -207,7 +207,7 @@ public class GameManager : MonoBehaviour {
             fogWar.AddFogExternal(u);
             //Debug.Log(":((((((((((((((");
         }
-
+        /*
         //QUITAR CUANDO NO QUERAMOS VER A LOS ENEMIGOS
         foreach (Unit u in enemyTeam)
         {
@@ -215,6 +215,7 @@ public class GameManager : MonoBehaviour {
             fogWar.AddFogExternal(u);
             //Debug.Log(":((((((((((((((");
         }
+        */
         TeamCheck();
         
 
