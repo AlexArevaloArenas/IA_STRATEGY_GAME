@@ -133,7 +133,7 @@ PrefabInstance:
     - target: {fileID: 6116105758803315063, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
         type: 3}
       propertyPath: MoveRange
-      value: 13
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6116105758803315063, guid: 31f3d9ebd11fbf04582545b59dc0ca89,
         type: 3}

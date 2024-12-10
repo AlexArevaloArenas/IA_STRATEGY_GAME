@@ -87,7 +87,7 @@ MonoBehaviour:
   currentHealth: 5
   AttackDamage: 5
   AttackRange: 3
-  MoveRange: 3
+  MoveRange: 7
   team: Enemy
   invisibleMat: {fileID: 2100000, guid: 0643e33d6677792459b53841bab5dbbc, type: 2}
   attackCylinder: {fileID: 0}
